@@ -63,6 +63,23 @@
             },
             "defaultValue": "10.0.5.4"
         },
+        "publicIPAddressType": {
+            "type": "string",
+            "defaultValue": "Dynamic",
+            "allowedValues": [
+              "Dynamic",
+              "Static"
+            ],
+            "metadata": {
+              "description": "Type of public IP address"
+            }
+        },
+        "dnsLabelPrefix": {
+            "type": "string",
+            "metadata": {
+              "description": "DNS Label for the Public IP. Must be lowercase. It should match with the following regular expression: ^[a-z][a-z0-9-]{1,61}[a-z0-9]$ or it will raise an error."
+            }
+        },
         "AvailSetName": {
             "type": "string",
             "metadata": {
@@ -90,9 +107,8 @@
         "api-version-vm": "2017-12-01",
         "mode": "Push",
         "baseUri": "https://raw.githubusercontent.com/prasroy/hanaaonzurearm/master/",
-        "nicName": "[if (equals(parameters('IPAllocationMethod'),'Static'), concat(parameters('vmName'),'-static'), concat(parameters('vmName'),'-dynamic'))]",
-        "pipId": "[resourceId('Microsoft.Network/publicIPAddresses',variables('pipName'))]",
-        "pipName":"[concat(parameters('vmName'),'-pip')]",
+        "nicName": "[if (equals(parameters('IPAllocationMethod'),'Static'), concat(parameters('vmName'),'-snic'), concat(parameters('vmName'),'-dnic'))]",
+        "publicIPAddressName": "[concat(parameters('vmName'),'-pip')]",
         "subnetRef": "[parameters('HANASubnetRef')]",
         "OperatingSystemSpec": {
             "imagePublisher": "[if (contains(parameters('OperatingSystem'),'SLES'),'SUSE','RedHat')]",
@@ -135,10 +151,22 @@
     },
     "resources": [
         {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+              "publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
+              "dnsSettings": {
+                "domainNameLabel": "[parameters('dnsLabelPrefix')]"
+              }
+            }
+          },
+        {
             "condition": "[equals(parameters('IPAllocationMethod'), 'Dynamic')]",
-            "apiVersion": "[variables('api-version')]",
+            "apiVersion":"2017-06-01",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[concat(parameters('vmName'),'-dynamic')]",
+            "name": "[concat(parameters('vmName'),'-dnic')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "enableAcceleratedNetworking": true,
@@ -148,7 +176,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[variables('pipId')]"
+                                "id": "[resourceId ('Microsoft.Network/publicIPAddress/',variables('publicIPAddressName'))]"
                               },
                             "subnet": {
                                 "id": "[variables('subnetRef')]"
@@ -160,9 +188,9 @@
         },
         {
             "condition": "[equals(parameters('IPAllocationMethod'), 'Static')]",
-            "apiVersion": "[variables('api-version')]",
+            "apiVersion":"2017-06-01",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[concat(parameters('vmName'),'-static')]",
+            "name": "[concat(parameters('vmName'),'-snic')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "enableAcceleratedNetworking": false,
@@ -170,6 +198,9 @@
                     {
                         "name": "ipconfig1",
                         "properties": {
+                            "publicIPAddress": {
+                                "id": "[resourceId ('Microsoft.Network/publicIPAddress/',variables('publicIPAddressName'))]"
+                              },
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "[parameters('StaticIP')]",
                             "subnet": {
@@ -180,15 +211,6 @@
                 ]
             }
         },
-        {
-            "name": "[variables('pipName')]",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2017-11-01",
-            "location": "[resourceGroup().location]",
-            "properties": {
-              "publicIPAllocationMethod": "Dynamic"
-            }
-          },
         {
             "type": "Microsoft.Compute/disks",
             "name": "[concat(parameters('vmName'),'-shared')]",
