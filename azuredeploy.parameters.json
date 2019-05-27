@@ -29,6 +29,12 @@
         "ManagementSubnetPrefix": {
             "value": "10.0.6.0/24"
         },
+        "dnsLabelPrefix": {
+            "value": "prlab"
+        },
+        "publicIPAddressType": {
+            "value": "Dynamic"
+        },
         "VMUserName": {
             "value": "azureuser"
         },
