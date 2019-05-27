@@ -40,6 +40,27 @@
             },
             "defaultValue": "Hana07061992!"
         },
+        "departmentName": {
+            "type": "string",
+            "defaultValue": "CSU-SE",
+            "metadata": {
+              "description": "Department Tag"
+            }
+        },
+          "applicationName": {
+            "type": "string",
+            "defaultValue": "hana",
+            "metadata": {
+              "description": "Application Tag"
+            }
+        },
+          "createdBy": {
+            "type": "string",
+            "defaultValue": "Prasenjit Roy",
+            "metadata": {
+              "description": "Created By Tag"
+            }
+        },
         "vmSize": {
             "type": "string",
             "metadata": {
@@ -155,6 +176,11 @@
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[variables('publicIPAddressName')]",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Application": "[parameters('applicationName')]",
+                "Created By": "[parameters('createdBy')]"
+            },
             "properties": {
               "publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
               "dnsSettings": {
@@ -168,6 +194,11 @@
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[concat(parameters('vmName'),'-dnic')]",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Application": "[parameters('applicationName')]",
+                "Created By": "[parameters('createdBy')]"
+            },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
 
@@ -196,6 +227,11 @@
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[concat(parameters('vmName'),'-snic')]",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Application": "[parameters('applicationName')]",
+                "Created By": "[parameters('createdBy')]"
+            },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
 
@@ -224,6 +260,11 @@
             "name": "[concat(parameters('vmName'),'-shared')]",
             "apiVersion": "2018-04-01",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Application": "[parameters('applicationName')]",
+                "Created By": "[parameters('createdBy')]"
+            },
             "sku": {
                 "name": "Standard_LRS",
                 "tier": "Standard"
@@ -240,6 +281,11 @@
             "name": "[concat(parameters('vmName'),'-sap')]",
             "apiVersion": "2018-04-01",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Application": "[parameters('applicationName')]",
+                "Created By": "[parameters('createdBy')]"
+            },
             "sku": {
                 "name": "Standard_LRS",
                 "tier": "Standard"
@@ -256,6 +302,11 @@
             "name": "[concat(parameters('vmName'),'-backup')]",
             "apiVersion": "2018-04-01",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Application": "[parameters('applicationName')]",
+                "Created By": "[parameters('createdBy')]"
+            },
             "sku": {
                 "name": "Standard_LRS",
                 "tier": "Standard"
@@ -272,6 +323,11 @@
             "name": "[concat(parameters('vmName'),'-data1')]",
             "apiVersion": "2018-04-01",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Application": "[parameters('applicationName')]",
+                "Created By": "[parameters('createdBy')]"
+            },
             "sku": {
                 "name": "Premium_LRS",
                 "tier": "Premium"
@@ -288,6 +344,11 @@
             "name": "[concat(parameters('vmName'),'-data2')]",
             "apiVersion": "2018-04-01",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Application": "[parameters('applicationName')]",
+                "Created By": "[parameters('createdBy')]"
+            },
             "sku": {
                 "name": "Premium_LRS",
                 "tier": "Premium"
@@ -304,6 +365,11 @@
             "name": "[concat(parameters('vmName'),'-data3')]",
             "apiVersion": "2018-04-01",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Application": "[parameters('applicationName')]",
+                "Created By": "[parameters('createdBy')]"
+            },
             "sku": {
                 "name": "Premium_LRS",
                 "tier": "Premium"
@@ -321,6 +387,11 @@
             "name": "[parameters('AvailSetName')]",
             "apiVersion": "2017-03-30",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Application": "[parameters('applicationName')]",
+                "Created By": "[parameters('createdBy')]"
+            },
             "sku": {
                 "name": "Aligned"
             },
@@ -334,6 +405,11 @@
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('vmName')]",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Application": "[parameters('applicationName')]",
+                "Created By": "[parameters('createdBy')]"
+            },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-shared'))]",
