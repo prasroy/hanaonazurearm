@@ -210,43 +210,19 @@
         "properties": {
           "securityRules": [
             {
-              "name": "AllowHANAport",
-              "properties": {
-                "description": "Allow HANA traffic to web servers",
-                "sourceAddressPrefix": "*",
-                "sourcePortRange": "*",
-                "direction": "Inbound",
-                "access": "Allow",
-                "priority": 200,
-                "protocol": "Tcp",
-                "destinationPortRange":"30013",
-                "destinationAddressPrefix": "*",
-                "destinationApplicationSecurityGroups": [
-                  {
-                    "id": "[variables('nsgId')]"
-                  }
-                ]
+                "name": "AllowSshAll",
+                "properties": {
+                  "description": "Allow SSH traffic to HANA servers",
+                  "sourceAddressPrefix": "*",
+                  "sourcePortRange": "*",
+                  "direction": "Inbound",
+                  "access": "Allow",
+                  "priority": 100,
+                  "protocol": "Tcp",
+                  "destinationPortRange": "22",
+                  "destinationAddressPrefix": "*"
+                }
               }
-            },
-            {
-              "name": "AllowSshAll",
-              "properties": {
-                "description": "Allow SSH traffic to HANA servers",
-                "sourceAddressPrefix": "*",
-                "sourcePortRange": "*",
-                "direction": "Inbound",
-                "access": "Allow",
-                "priority": 100,
-                "protocol": "Tcp",
-                "destinationPortRange": "22",
-                "destinationAddressPrefix": "*",
-                "destinationApplicationSecurityGroups": [
-                  {
-                    "id": "[variables('nsgId')]"
-                  }
-                ]
-              }
-            }
           ]
         }
       },
