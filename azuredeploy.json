@@ -158,6 +158,8 @@
     "largeUri": "[concat(variables('baseUri'),'Vms/large.json')]",
     "extralargeUri": "[concat(variables('baseUri'),'Vms/extralarge.json')]",	  
     "hanajbUri": "[concat(variables('baseUri'),'Vms/hanajb.json')]",
+    "nsgName":"[concat(parameters('vmName'),'-nsg')]",
+    "nsgId": "[resourceId('Microsoft.Network/applicationSecurityGroups',variables('nsgName'))]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('NetworkName'))]",
     "HANAsubnetRef": "[if (equals(parameters('ExistingNetworkResourceGroup'), 'no') , concat(variables('vnetID'),'/subnets/',parameters('HANASubnetName')),concat(resourceId(parameters('ExistingNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks/', parameters('NetworkName')), '/subnets/',parameters('HANASubnetName')))]",
     "mgmtSubnetRef": "[if (equals(parameters('ExistingNetworkResourceGroup'), 'no') , concat(variables('vnetID'),'/subnets/',parameters('ManagementSubnetName')),concat(resourceId(parameters('ExistingNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks/', parameters('NetworkName')), '/subnets/',parameters('ManagementSubnetName')))]",
@@ -182,15 +184,69 @@
             {
               "name": "[parameters('HANASubnetName')]",
               "properties": {
-                "addressPrefix": "[parameters('HANASubnetPrefix')]"
+                "addressPrefix": "[parameters('HANASubnetPrefix')]",
+                "networkSecurityGroup": {
+                    "id": "[variables('nsgId')]"
+                }
               }
             },
             {
                 "name": "[parameters('ManagementSubnetName')]",
                 "properties": {
-                  "addressPrefix": "[parameters('ManagementSubnetPrefix')]"
+                  "addressPrefix": "[parameters('ManagementSubnetPrefix')]",
+                  "networkSecurityGroup": {
+                    "id": "[variables('nsgId')]"
+                }
                 }
               }
+          ]
+        }
+      },
+      {
+        "apiVersion": "2017-09-01",
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "name": "[variables('nsgName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "securityRules": [
+            {
+              "name": "AllowHANAport",
+              "properties": {
+                "description": "Allow HANA traffic to web servers",
+                "sourceAddressPrefix": "*",
+                "sourcePortRange": "*",
+                "direction": "Inbound",
+                "access": "Allow",
+                "priority": 200,
+                "protocol": "Tcp",
+                "destinationPortRange":"30013",
+                "destinationAddressPrefix": "*",
+                "destinationApplicationSecurityGroups": [
+                  {
+                    "id": "[variables('nsgId')]"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "AllowSshAll",
+              "properties": {
+                "description": "Allow SSH traffic to HANA servers",
+                "sourceAddressPrefix": "*",
+                "sourcePortRange": "*",
+                "direction": "Inbound",
+                "access": "Allow",
+                "priority": 100,
+                "protocol": "Tcp",
+                "destinationPortRange": "22",
+                "destinationAddressPrefix": "*",
+                "destinationApplicationSecurityGroups": [
+                  {
+                    "id": "[variables('nsgId')]"
+                  }
+                ]
+              }
+            }
           ]
         }
       },
