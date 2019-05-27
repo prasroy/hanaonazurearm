@@ -211,7 +211,7 @@
         "properties": {
           "securityRules": [
             {
-                "name": "AllowSshAll",
+                "name": "AllowSShAll",
                 "properties": {
                   "description": "Allow SSH traffic to HANA servers",
                   "sourceAddressPrefix": "*",
