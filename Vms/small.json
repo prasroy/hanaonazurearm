@@ -106,7 +106,7 @@
     "variables": {
         "api-version-vm": "2017-12-01",
         "mode": "Push",
-        "baseUri": "https://raw.githubusercontent.com/prasroy/hanaonzurearm/master/",
+        "baseUri": "https://raw.githubusercontent.com/prasroy/hanaonazurearm/master/",
         "nicName": "[if (equals(parameters('IPAllocationMethod'),'Static'), concat(parameters('vmName'),'-snic'), concat(parameters('vmName'),'-dnic'))]",
         "publicIPAddressName": "[concat(parameters('vmName'),'-pip')]",
         "subnetRef": "[parameters('HANASubnetRef')]",
