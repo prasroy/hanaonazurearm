@@ -117,12 +117,12 @@
         },
         "diskConfig": "[variables(concat('diskConfig_', parameters('vmSize')))]",
         "diskConfig_Standard_E16s_v3": {
-            "shared": 511,
-            "sap": 63,
-            "backup": 255,
-            "data1": 255,
-            "data2": 255,
-            "data3": 511
+            "shared": 128,
+            "sap": 64,
+            "backup": 256,
+            "data1": 256,
+            "data2": 256,
+            "data3": 512
         },
         "diskConfig_Standard_E32s_v3": {
             "shared": 512,
