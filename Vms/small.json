@@ -166,8 +166,12 @@
             "condition": "[equals(parameters('IPAllocationMethod'), 'Dynamic')]",
             "apiVersion":"2017-06-01",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[concat(parameters('vmName'),'-dnic')]",
+            "name": "[variables('nicName')]",
             "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
+
+            ],
             "properties": {
                 "enableAcceleratedNetworking": true,
                 "ipConfigurations": [
@@ -190,8 +194,12 @@
             "condition": "[equals(parameters('IPAllocationMethod'), 'Static')]",
             "apiVersion":"2017-06-01",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[concat(parameters('vmName'),'-snic')]",
+            "name": "[variables('nicName')]",
             "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
+
+            ],
             "properties": {
                 "enableAcceleratedNetworking":true,
                 "ipConfigurations": [
