@@ -2,7 +2,7 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "vmName": {
+        "VMName": {
             "type": "string",
             "maxLength": 13,
             "metadata": {
@@ -19,7 +19,7 @@
                 "no"
             ]
         },
-        "VMSize": {
+        "vmSize": {
             "type": "string",
             "metadata": {
                 "description": "VM Size"
@@ -148,18 +148,11 @@
             "description": "OS Subscription ID for BYOS, blank for PAYG"
           },
           "defaultValue": ""
-        },
-        "SMTUri": {
-            "type": "string",
-            "metadata": {
-              "description": "SMT URI, blank for none"
-            },
-            "defaultValue": ""
-          }                               
+        }                             
     },
   "variables": {
     "vmName": "[toLower(parameters('vmName'))]",
-    "baseUri": "https://raw.githubusercontent.com/prasroy/hanaazurearm/master/",
+    "baseUri": "https://raw.githubusercontent.com/prasroy/hanaonazurearm/master/",
     "smallUri": "[concat(variables('baseUri'),'Vms/small.json')]",
     "mediumUri": "[concat(variables('baseUri'),'Vms/medium.json')]",
     "largeUri": "[concat(variables('baseUri'),'Vms/large.json')]",
@@ -216,7 +209,7 @@
                 },
                 "parameters": {               
                     "vmName": {
-                        "value": "[parameters('vmName')]"
+                        "value": "[parameters('VMName')]"
                     },
                     "HANAsubnetRef": {
                         "value": "[variables('HANAsubnetRef')]"
