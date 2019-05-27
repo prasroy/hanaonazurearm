@@ -166,10 +166,10 @@
             "condition": "[equals(parameters('IPAllocationMethod'), 'Dynamic')]",
             "apiVersion":"2017-06-01",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[variables('nicName')]",
+            "name": "[concat(parameters('vmName'),'-dnic')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
 
             ],
             "properties": {
@@ -179,7 +179,7 @@
                         "name": "ipconfig1",
                         "properties": {
                             "publicIPAddress": {
-                                "id": "[resourceId ('Microsoft.Network/publicIPAddresses/',variables('publicIPAddressName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses/',variables('publicIPAddressName'))]"
                               },
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
@@ -194,10 +194,10 @@
             "condition": "[equals(parameters('IPAllocationMethod'), 'Static')]",
             "apiVersion":"2017-06-01",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[variables('nicName')]",
+            "name": "[concat(parameters('vmName'),'-snic')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
 
             ],
             "properties": {
@@ -207,7 +207,7 @@
                         "name": "ipconfig1",
                         "properties": {
                             "publicIPAddress": {
-                                "id": "[resourceId ('Microsoft.Network/publicIPAddresses/',variables('publicIPAddressName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses/',variables('publicIPAddressName'))]"
                               },
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "[parameters('StaticIP')]",
