@@ -1,0 +1,51 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "value": "hanadev"
+        },
+        "HANAJumpbox": {
+            "value": "no"
+        },
+        "VMSize": {
+            "value": "Standard_GS5 (448 GB, Certified)"
+        },
+        "NetworkName": {
+            "value": "sap-vnet"
+        },
+        "addressPrefixes": {
+            "value": "10.0.0.0/16"
+        },
+        "HANASubnetName": {
+            "value": "sap-hana-subnet"
+        },
+        "HANASubnetPrefix": {
+            "value": "10.0.5.0/24"
+        },
+        "ManagementSubnetName": {
+            "value": "sap-mgt-subnet"
+        },
+        "ManagementSubnetPrefix": {
+            "value": "10.0.6.0/24"
+        },
+        "VMUserName": {
+            "value": "azureuser"
+        },
+        "VMPassword": {
+            "value": "YourPassword"
+                        },                    
+        "OperatingSystem": {
+            "value":  "SLES for SAP 12 SP3"
+        },
+        "ExistingNetworkResourceGroup": {
+            "value": "no"
+        },
+        "IPAllocationMethod": {
+            "value": "Static"
+        },
+        "StaticIP": {
+          "value":  "10.0.5.4"
+        }               
+    }
+}
