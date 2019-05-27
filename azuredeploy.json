@@ -91,6 +91,27 @@
                 "description": "Password for the Virtual Machine"
             }
         },
+        "departmentName": {
+            "type": "string",
+            "defaultValue": "CSU-SE",
+            "metadata": {
+              "description": "Department Tag"
+            }
+        },
+          "applicationName": {
+            "type": "string",
+            "defaultValue": "hana",
+            "metadata": {
+              "description": "Application Tag"
+            }
+        },
+          "createdBy": {
+            "type": "string",
+            "defaultValue": "Prasenjit Roy",
+            "metadata": {
+              "description": "Created By Tag"
+            }
+        },
         "OperatingSystem": {
             "type": "string",
             "metadata": {
@@ -172,6 +193,11 @@
         "type": "Microsoft.Network/virtualNetworks",
         "name": "[parameters('NetworkName')]",
         "location": "[resourceGroup().location]",
+        "tags": {
+            "Department": "[parameters('departmentName')]",
+            "Application": "[parameters('applicationName')]",
+            "Created By": "[parameters('createdBy')]"
+        },
         "dependsOn": [
             "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgName'))]"
           ],
@@ -208,6 +234,11 @@
         "type": "Microsoft.Network/networkSecurityGroups",
         "name": "[variables('nsgName')]",
         "location": "[resourceGroup().location]",
+        "tags": {
+            "Department": "[parameters('departmentName')]",
+            "Application": "[parameters('applicationName')]",
+            "Created By": "[parameters('createdBy')]"
+        },
         "properties": {
           "securityRules": [
             {
