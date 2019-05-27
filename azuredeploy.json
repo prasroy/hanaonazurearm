@@ -128,23 +128,6 @@
           },
           "defaultValue": "10.0.5.4"
         },
-        "publicIPAddressType": {
-            "type": "string",
-            "defaultValue": "Dynamic",
-            "allowedValues": [
-              "Dynamic",
-              "Static"
-            ],
-            "metadata": {
-              "description": "Type of public IP address"
-            }
-        },
-        "dnsLabelPrefix": {
-            "type": "string",
-            "metadata": {
-              "description": "DNS Label for the Public IP. Must be lowercase. It should match with the following regular expression: ^[a-z][a-z0-9-]{1,61}[a-z0-9]$ or it will raise an error."
-            }
-        },
         "AvailSetName": {
           "type": "string",
           "metadata": {
@@ -175,7 +158,6 @@
     "largeUri": "[concat(variables('baseUri'),'Vms/large.json')]",
     "extralargeUri": "[concat(variables('baseUri'),'Vms/extralarge.json')]",	  
     "hanajbUri": "[concat(variables('baseUri'),'Vms/hanajb.json')]",
-    "publicIPAddressName": "[concat(variables('vmName'),'-pip')]",
     "nsgName":"[concat(parameters('vmName'),'-nsg')]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('NetworkName'))]",
     "HANAsubnetRef": "[if (equals(parameters('ExistingNetworkResourceGroup'), 'no') , concat(variables('vnetID'),'/subnets/',parameters('HANASubnetName')),concat(resourceId(parameters('ExistingNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks/', parameters('NetworkName')), '/subnets/',parameters('HANASubnetName')))]",
@@ -184,19 +166,6 @@
     "vmSize": "[variables('vmSizeArray')[0]]"
 },
     "resources": [
-
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('publicIPAddressName')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-              "publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
-              "dnsSettings": {
-                "domainNameLabel": "[parameters('dnsLabelPrefix')]"
-              }
-            }
-          },
         {
         "condition": "[equals(parameters('ExistingNetworkResourceGroup'), 'no')]",
         "apiVersion": "2016-09-01",
