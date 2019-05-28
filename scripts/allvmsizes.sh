@@ -271,19 +271,6 @@ echo "/dev/mapper/backupvg-backuplv /hana/backup xfs defaults 0 0" >> /etc/fstab
 echo "/dev/mapper/usrsapvg-usrsaplv /usr/sap xfs defaults 0 0" >> /etc/fstab
 echo "write to fstab end" >> /tmp/parameter.txt
 
-#!/bin/bash
-cd /hana/data/sapbits
-echo "hana download start" >> /tmp/parameter.txt
-/usr/bin/wget --quiet $Uri/SapBits/md5sums
-/usr/bin/wget --quiet "https://raw.githubusercontent.com/AzureCAT-GSI/SAP-HANA-ARM/master/hdbinst.cfg"
-echo "hana download end" >> /tmp/parameter.txt
-
-date >> /tmp/testdate
-cd /hana/data/sapbits
-
-echo "hana prepare start" >> /tmp/parameter.txt
-cd /hana/data/sapbits
-
 #put host entry in hosts file using instance metadata api
 VMIPADDR=`curl -H Metadata:true "http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/privateIpAddress?api-version=2017-08-01&format=text"`
 VMNAME=`hostname`
