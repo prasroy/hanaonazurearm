@@ -141,16 +141,16 @@
             "shared": 128,
             "sap": 64,
             "backup": 256,
-            "data1": 256,
-            "data2": 256,
+            "data1": 512,
+            "data2": 512,
             "data3": 512
         },
         "diskConfig_Standard_E32s_v3": {
-            "shared": 512,
+            "shared": 256,
             "sap": 64,
             "backup": 512,
-            "data1": 256,
-            "data2": 256,
+            "data1": 512,
+            "data2": 512,
             "data3": 512
         },
         "diskConfig_Standard_E64s_v3": {
@@ -381,7 +381,6 @@
                 "diskSizeGB": "[variables('diskConfig').data3]"
             }
         },
-
         {
             "type": "Microsoft.Compute/availabilitySets",
             "name": "[parameters('AvailSetName')]",
