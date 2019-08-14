@@ -5,7 +5,7 @@
         "vmName": {
             "type": "string",
             "metadata": {
-                "description": "VM Name"
+                "description": "Provide the VM name for HANA"
             }
         },
         "HANAsubnetRef": {
@@ -17,13 +17,13 @@
         "OperatingSystem": {
             "type": "string",
             "metadata": {
-                "description": "Operating system for HANA Machine"
+                "description": "Select the Operating system for your HANA VM"
             },
             "defaultValue": "SLES for SAP 12 SP3",
             "allowedValues": [
+                "SLES for SAP 12 SP4",
                 "SLES for SAP 12 SP3",
-                "SLES for SAP 12 SP2",
-                "RHEL 7.2 for SAP HANA"
+                "RHEL 7.3 for SAP HANA",
             ]
         },
         "vmUserName": {
@@ -49,7 +49,7 @@
         },
           "applicationName": {
             "type": "string",
-            "defaultValue": "hana",
+            "defaultValue": "hanadb",
             "metadata": {
               "description": "Application Tag"
             }
@@ -74,7 +74,7 @@
                 "Static"
             ],
             "metadata": {
-                "description": "IP Allocation Method"
+                "description": "IP Allocation Method for the HANA VM"
             }
         },
         "StaticIP": {
@@ -105,24 +105,10 @@
         "AvailSetName": {
             "type": "string",
             "metadata": {
-              "description": "This is the name of the availability set to deploy the machine in"
+              "description": "Provide the name of the availability set to deploy your HANA VMs"
             },
             "defaultValue": ""
-          },            
-        "SubscriptionEmail": {
-            "type": "string",
-            "metadata": {
-                "description": "OS Subscription Email for BYOS, blank for PAYG"
-            },
-            "defaultValue": ""
-        },
-        "SubscriptionID": {
-            "type": "string",
-            "metadata": {
-                "description": "OS Subscription ID for BYOS, blank for PAYG"
-            },
-            "defaultValue": ""
-        }
+          }
     },
     "variables": {
         "api-version-vm": "2017-12-01",
@@ -133,8 +119,8 @@
         "subnetRef": "[parameters('HANASubnetRef')]",
         "OperatingSystemSpec": {
             "imagePublisher": "[if (contains(parameters('OperatingSystem'),'SLES'),'SUSE','RedHat')]",
-            "imageOffer": "[if (contains(parameters('OperatingSystem'),'SLES'),if (contains(parameters('SubscriptionEmail'),'@'),'SLES-SAP-BYOS','SLES-SAP'),'RHEL-SAP-HANA')]",
-            "sku": "[if (contains(parameters('OperatingSystem'),'12 SP3'),'12-SP3',if (contains(parameters('OperatingSystem'),'12 SP2'),'12-SP2','7.2'))]"
+            "imageOffer": "[if (contains(parameters('OperatingSystem'),'SLES'),'SLES-SAP','RHEL-SAP-HANA')]",
+            "sku": "[if (contains(parameters('OperatingSystem'),'12 SP4'),'12-SP4',if (contains(parameters('OperatingSystem'),'12 SP3'),'12-SP3','7.3'))]"
         },
         "diskConfig": "[variables(concat('diskConfig_', parameters('vmSize')))]",
         "diskConfig_Standard_E8s_v3": {
@@ -149,30 +135,14 @@
             "shared": 128,
             "sap": 64,
             "backup": 256,
-            "data1": 512,
-            "data2": 512,
-            "data3": 512
+            "data1": 256,
+            "data2": 256,
+            "data3": 256
         },
         "diskConfig_Standard_E32s_v3": {
             "shared": 256,
             "sap": 64,
-            "backup": 512,
-            "data1": 512,
-            "data2": 512,
-            "data3": 512
-        },
-        "diskConfig_Standard_E64s_v3": {
-            "shared": 512,
-            "sap": 64,
-            "backup": 1024,
-            "data1": 512,
-            "data2": 512,
-            "data3": 512
-        },
-        "diskConfig_Standard_GS5": {
-            "shared": 512,
-            "sap": 64,
-            "backup": 1024,
+            "backup": 256,
             "data1": 512,
             "data2": 512,
             "data3": 512
