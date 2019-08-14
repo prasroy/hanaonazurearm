@@ -1,22 +1,9 @@
 set -x
 
 vmSize=${7}
-SUBEMAIL=${8}
-SUBID=${9}
-SUBURL=${10}
-
-#if needed, register the machine
-if [ "$SUBEMAIL" != "" ]; then
-  if [ "$SUBURL" != "" ]; then 
-   SUSEConnect -e $SUBEMAIL -r $SUBID --url $SUBURL
-  else 
-   SUSEConnect -e $SUBEMAIL -r $SUBID
-  fi
-fi
 
 #get the VM size via the instance api
 VMSIZE=`curl -H Metadata:true "http://169.254.169.254/metadata/instance/compute/vmSize?api-version=2017-08-01&format=text"`
-
 
 #install hana prereqs
 zypper install -y glibc-2.22-51.6
@@ -57,7 +44,7 @@ pvcreate -ff -y  /dev/disk/azure/scsi1/lun3
 pvcreate -ff -y  /dev/disk/azure/scsi1/lun4
 pvcreate -ff -y  /dev/disk/azure/scsi1/lun5
 
-if [ $VMSIZE == "Standard_E16s_v3" ] || [ "$VMSIZE" == "Standard_E32s_v3" ] || [ "$VMSIZE" == "Standard_E64s_v3" ] || [ "$VMSIZE" == "Standard_GS5" ] || [ "$VMSIZE" == "Standard_M32ts" ] || [ "$VMSIZE" == "Standard_M32ls" ] || [ "$VMSIZE" == "Standard_M64ls" ] || [ $VMSIZE == "Standard_DS14_v2" ] ; then
+if [ $VMSIZE == "Standard_E8s_v3" ] || [ "$VMSIZE" == "Standard_E16s_v3" ] || [ "$VMSIZE" == "Standard_E64s_v3" ] || [ "$VMSIZE" == "Standard_GS5" ] || [ "$VMSIZE" == "Standard_M32ts" ] || [ "$VMSIZE" == "Standard_M32ls" ] || [ "$VMSIZE" == "Standard_M64ls" ] || [ $VMSIZE == "Standard_DS14_v2" ] ; then
 echo "logicalvols start" >> /tmp/parameter.txt
   #shared volume creation
   sharedvglun="/dev/disk/azure/scsi1/lun0"

@@ -520,7 +520,7 @@
                             "fileUris": [
                                 "[concat(variables('baseUri'),'scripts/allvmsizes.sh')]"
                             ],
-                            "commandToExecute": "[concat('sh allvmsizes.sh \"', parameters('vmUserName'), '\" \"', parameters('vmPassword'),'\" \"',  parameters('vmSize'), '\" \"',parameters('SubscriptionEmail'), '\" \"', parameters('SubscriptionID'),'\"')]"
+                            "commandToExecute": "[concat('sh allvmsizes.sh \"', parameters('vmUserName'), '\" \"', parameters('vmPassword'),'\" \"',  parameters('vmSize'), '\" \"')]"
                         }
                     }
                 }
