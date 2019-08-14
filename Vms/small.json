@@ -137,6 +137,14 @@
             "sku": "[if (contains(parameters('OperatingSystem'),'12 SP3'),'12-SP3',if (contains(parameters('OperatingSystem'),'12 SP2'),'12-SP2','7.2'))]"
         },
         "diskConfig": "[variables(concat('diskConfig_', parameters('vmSize')))]",
+        "diskConfig_Standard_E8s_v3": {
+            "shared": 64,
+            "sap": 64,
+            "backup": 128,
+            "data1": 128,
+            "data2": 128,
+            "data3": 128
+        },
         "diskConfig_Standard_E16s_v3": {
             "shared": 128,
             "sap": 64,
@@ -266,8 +274,8 @@
                 "Created By": "[parameters('createdBy')]"
             },
             "sku": {
-                "name": "StandardSSD_LRS",
-                "tier": "Standard"
+                "name": "Premium_LRS",
+                "tier": "Premium"
             },
             "properties": {
                 "creationData": {
@@ -287,8 +295,8 @@
                 "Created By": "[parameters('createdBy')]"
             },
             "sku": {
-                "name": "StandardSSD_LRS",
-                "tier": "Standard"
+                "name": "Premium_LRS",
+                "tier": "Premium"
             },
             "properties": {
                 "creationData": {
@@ -308,8 +316,8 @@
                 "Created By": "[parameters('createdBy')]"
             },
             "sku": {
-                "name": "StandardSSD_LRS",
-                "tier": "Standard"
+                "name": "Premium_LRS",
+                "tier": "Premium"
             },
             "properties": {
                 "creationData": {
