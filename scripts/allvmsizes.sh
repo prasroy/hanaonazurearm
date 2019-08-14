@@ -42,8 +42,9 @@ pvcreate -ff -y  /dev/disk/azure/scsi1/lun2
 pvcreate -ff -y  /dev/disk/azure/scsi1/lun3
 pvcreate -ff -y  /dev/disk/azure/scsi1/lun4
 pvcreate -ff -y  /dev/disk/azure/scsi1/lun5
+pvcreate -ff -y  /dev/disk/azure/scsi1/lun6
 
-if [ $VMSIZE == "Standard_E8s_v3" ] || [ "$VMSIZE" == "Standard_E16s_v3" ] || [ "$VMSIZE" == "Standard_E64s_v3" ] || [ "$VMSIZE" == "Standard_GS5" ] || [ "$VMSIZE" == "Standard_M32ts" ] || [ "$VMSIZE" == "Standard_M32ls" ] || [ "$VMSIZE" == "Standard_M64ls" ] || [ $VMSIZE == "Standard_DS14_v2" ] ; then
+if [ $VMSIZE == "Standard_E8s_v3" ] || [ "$VMSIZE" == "Standard_E16s_v3" ] || [ "$VMSIZE" == "Standard_E32s_v3" ] || [ "$VMSIZE" == "Standard_E64s_v3" ] ; then
 echo "logicalvols start" >> /tmp/parameter.txt
   #shared volume creation
   sharedvglun="/dev/disk/azure/scsi1/lun0"
@@ -64,13 +65,12 @@ echo "logicalvols start" >> /tmp/parameter.txt
   datavg1lun="/dev/disk/azure/scsi1/lun3"
   datavg2lun="/dev/disk/azure/scsi1/lun4"
   datavg3lun="/dev/disk/azure/scsi1/lun5"
-  vgcreate datavg $datavg1lun $datavg2lun $datavg3lun
-  PHYSVOLUMES=3
+  datavg4lun="/dev/disk/azure/scsi1/lun6"
+  vgcreate datavg $datavg1lun $datavg2lun $datavg3lun $datavg4lun
+  PHYSVOLUMES=4
   STRIPESIZE=64
-  lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 70%FREE -n datalv datavg
+  lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 75%FREE -n datalv datavg
   lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 100%FREE -n loglv datavg
-
-
   mkfs.xfs /dev/datavg/datalv
   mkfs.xfs /dev/datavg/loglv
   mkfs -t xfs /dev/sharedvg/sharedlv 
@@ -79,167 +79,6 @@ echo "logicalvols start" >> /tmp/parameter.txt
   mount -t xfs /dev/datavg/loglv /hana/log 
   echo "/dev/mapper/datavg-loglv /hana/log xfs defaults 0 0" >> /etc/fstab
 echo "logicalvols end" >> /tmp/parameter.txt
-fi
-
-if [ $VMSIZE == "Standard_M64s" ]; then
-  #this is the medium size
-  # this assumes that 6 disks are attached at lun 0 through 5
-  echo "Creating partitions and physical volumes"
-  pvcreate -ff -y  /dev/disk/azure/scsi1/lun6
-  pvcreate -ff -y  /dev/disk/azure/scsi1/lun7
-  pvcreate -ff -y /dev/disk/azure/scsi1/lun8
-  pvcreate -ff -y /dev/disk/azure/scsi1/lun9
-
-  echo "logicalvols start" >> /tmp/parameter.txt
-  #shared volume creation
-  sharedvglun="/dev/disk/azure/scsi1/lun0"
-  vgcreate sharedvg $sharedvglun
-  lvcreate -l 100%FREE -n sharedlv sharedvg 
- 
-  #usr volume creation
-  usrsapvglun="/dev/disk/azure/scsi1/lun1"
-  vgcreate usrsapvg $usrsapvglun
-  lvcreate -l 100%FREE -n usrsaplv usrsapvg
-
-  #backup volume creation
-  backupvg1lun="/dev/disk/azure/scsi1/lun2"
-  backupvg2lun="/dev/disk/azure/scsi1/lun3"
-  vgcreate backupvg $backupvg1lun $backupvg2lun
-  lvcreate -l 100%FREE -n backuplv backupvg 
-
-  #data volume creation
-  datavg1lun="/dev/disk/azure/scsi1/lun4"
-  datavg2lun="/dev/disk/azure/scsi1/lun5"
-  datavg3lun="/dev/disk/azure/scsi1/lun6"
-  datavg4lun="/dev/disk/azure/scsi1/lun7"
-  vgcreate datavg $datavg1lun $datavg2lun $datavg3lun $datavg4lun
-  PHYSVOLUMES=4
-  STRIPESIZE=64
-  lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 100%FREE -n datalv datavg
-
-  #log volume creation
-  logvg1lun="/dev/disk/azure/scsi1/lun8"
-  logvg2lun="/dev/disk/azure/scsi1/lun9"
-  vgcreate logvg $logvg1lun $logvg2lun
-  PHYSVOLUMES=2
-  STRIPESIZE=32
-  lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 100%FREE -n loglv logvg
-  mount -t xfs /dev/logvg/loglv /hana/log 
-echo "/dev/mapper/logvg-loglv /hana/log xfs defaults 0 0" >> /etc/fstab
-
-  mkfs.xfs /dev/datavg/datalv
-  mkfs.xfs /dev/logvg/loglv
-  mkfs -t xfs /dev/sharedvg/sharedlv 
-  mkfs -t xfs /dev/backupvg/backuplv 
-  mkfs -t xfs /dev/usrsapvg/usrsaplv
-echo "logicalvols end" >> /tmp/parameter.txt
-fi
-
-if [ $VMSIZE == "Standard_M64ms" ] || [ $VMSIZE == "Standard_M128s" ]; then
-
-  # this assumes that 6 disks are attached at lun 0 through 9
-  echo "Creating partitions and physical volumes"
-  pvcreate -ff -y  /dev/disk/azure/scsi1/lun6
-  pvcreate -ff -y  /dev/disk/azure/scsi1/lun7
-  pvcreate  -ff -y /dev/disk/azure/scsi1/lun8
-
-  echo "logicalvols start" >> /tmp/parameter.txt
-  #shared volume creation
-  sharedvglun="/dev/disk/azure/scsi1/lun0"
-  vgcreate sharedvg $sharedvglun
-  lvcreate -l 100%FREE -n sharedlv sharedvg 
- 
-  #usr volume creation
-  usrsapvglun="/dev/disk/azure/scsi1/lun1"
-  vgcreate usrsapvg $usrsapvglun
-  lvcreate -l 100%FREE -n usrsaplv usrsapvg
-
-  #backup volume creation
-  backupvg1lun="/dev/disk/azure/scsi1/lun2"
-  backupvg2lun="/dev/disk/azure/scsi1/lun3"
-  vgcreate backupvg $backupvg1lun $backupvg2lun
-  lvcreate -l 100%FREE -n backuplv backupvg 
-
-  #data volume creation
-  datavg1lun="/dev/disk/azure/scsi1/lun4"
-  datavg2lun="/dev/disk/azure/scsi1/lun5"
-  datavg3lun="/dev/disk/azure/scsi1/lun6"
-  vgcreate datavg $datavg1lun $datavg2lun $datavg3lun 
-  PHYSVOLUMES=3
-  STRIPESIZE=64
-  lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 100%FREE -n datalv datavg
-
-  #log volume creation
-  logvg1lun="/dev/disk/azure/scsi1/lun7"
-  logvg2lun="/dev/disk/azure/scsi1/lun8"
-  vgcreate logvg $logvg1lun $logvg2lun
-  PHYSVOLUMES=2
-  STRIPESIZE=32
-  lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 100%FREE -n loglv logvg
-  mount -t xfs /dev/logvg/loglv /hana/log   
-echo "/dev/mapper/logvg-loglv /hana/log xfs defaults 0 0" >> /etc/fstab
-
-  mkfs.xfs /dev/datavg/datalv
-  mkfs.xfs /dev/logvg/loglv
-  mkfs -t xfs /dev/sharedvg/sharedlv 
-  mkfs -t xfs /dev/backupvg/backuplv 
-  mkfs -t xfs /dev/usrsapvg/usrsaplv
-echo "logicalvols end" >> /tmp/parameter.txt
-fi
-
-if [ $VMSIZE == "Standard_M128ms" || [ $VMSIZE == "Standard_M208ms_v2" ]; then
-
-  # this assumes that 6 disks are attached at lun 0 through 5
-  echo "Creating partitions and physical volumes"
-  pvcreate -ff -y  /dev/disk/azure/scsi1/lun6
-  pvcreate -ff -y  /dev/disk/azure/scsi1/lun7
-  pvcreate  -ff -y /dev/disk/azure/scsi1/lun8
-  pvcreate  -ff -y /dev/disk/azure/scsi1/lun9
-  pvcreate  -ff -y /dev/disk/azure/scsi1/lun10
-
-  echo "logicalvols start" >> /tmp/parameter.txt
-  #shared volume creation
-  sharedvglun="/dev/disk/azure/scsi1/lun0"
-  vgcreate sharedvg $sharedvglun
-  lvcreate -l 100%FREE -n sharedlv sharedvg 
- 
-  #usr volume creation
-  usrsapvglun="/dev/disk/azure/scsi1/lun1"
-  vgcreate usrsapvg $usrsapvglun
-  lvcreate -l 100%FREE -n usrsaplv usrsapvg
-
-  #backup volume creation
-  backupvg1lun="/dev/disk/azure/scsi1/lun2"
-  backupvg2lun="/dev/disk/azure/scsi1/lun3"
-  vgcreate backupvg $backupvg1lun $backupvg2lun
-  lvcreate -l 100%FREE -n backuplv backupvg 
-
-  #data volume creation
-  datavg1lun="/dev/disk/azure/scsi1/lun4"
-  datavg2lun="/dev/disk/azure/scsi1/lun5"
-  datavg3lun="/dev/disk/azure/scsi1/lun6"
-  datavg4lun="/dev/disk/azure/scsi1/lun7"
-  datavg5lun="/dev/disk/azure/scsi1/lun8"
-  vgcreate datavg $datavg1lun $datavg2lun $datavg3lun $datavg4lun $datavg5lun
-  PHYSVOLUMES=4
-  STRIPESIZE=64
-  lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 100%FREE -n datalv datavg
-
-  #log volume creation
-  logvg1lun="/dev/disk/azure/scsi1/lun9"
-  logvg2lun="/dev/disk/azure/scsi1/lun10"
-  vgcreate logvg $logvg1lun $logvg2lun
-  PHYSVOLUMES=2
-  STRIPESIZE=32
-  lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 100%FREE -n loglv logvg
-  mount -t xfs /dev/logvg/loglv /hana/log 
-  echo "/dev/mapper/logvg-loglv /hana/log xfs defaults 0 0" >> /etc/fstab
-
-  mkfs.xfs /dev/datavg/datalv
-  mkfs.xfs /dev/logvg/loglv
-  mkfs -t xfs /dev/sharedvg/sharedlv 
-  mkfs -t xfs /dev/backupvg/backuplv 
-  mkfs -t xfs /dev/usrsapvg/usrsaplv
 fi
 
 #!/bin/bash

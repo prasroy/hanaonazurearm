@@ -129,23 +129,35 @@
             "backup": 128,
             "data1": 128,
             "data2": 128,
-            "data3": 128
+            "data3": 128,
+            "data4": 128
         },
         "diskConfig_Standard_E16s_v3": {
             "shared": 128,
             "sap": 64,
-            "backup": 256,
-            "data1": 256,
-            "data2": 256,
-            "data3": 256
+            "backup": 128,
+            "data1": 128,
+            "data2": 128,
+            "data3": 128,
+            "data4": 128
         },
         "diskConfig_Standard_E32s_v3": {
             "shared": 256,
             "sap": 64,
             "backup": 256,
+            "data1": 256,
+            "data2": 256,
+            "data3": 245,
+            "data4": 256
+        },
+        "diskConfig_Standard_E64s_v3": {
+            "shared": 512,
+            "sap": 64,
+            "backup": 512,
             "data1": 512,
             "data2": 512,
-            "data3": 512
+            "data3": 512,
+            "data4": 512
         }
     },
     "resources": [
@@ -360,6 +372,27 @@
             }
         },
         {
+            "type": "Microsoft.Compute/disks",
+            "name": "[concat(parameters('vmName'),'-data4')]",
+            "apiVersion": "2018-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Application": "[parameters('applicationName')]",
+                "Created By": "[parameters('createdBy')]"
+            },
+            "sku": {
+                "name": "Premium_LRS",
+                "tier": "Premium"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[variables('diskConfig').data4]"
+            }
+        },
+        {
             "type": "Microsoft.Compute/availabilitySets",
             "name": "[parameters('AvailSetName')]",
             "apiVersion": "2017-03-30",
@@ -395,6 +428,7 @@
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-data1'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-data2'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-data3'))]",
+                "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-data4'))]",
                 "[resourceId('Microsoft.Compute/availabilitySets', parameters('AvailSetName'))]"
             ],
             "properties": {
@@ -460,6 +494,13 @@
                             "createOption": "Attach",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-data3'))]"
+                            }
+                        },
+                        {
+                            "lun": 6,
+                            "createOption": "Attach",
+                            "managedDisk": {
+                                "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-data4'))]"
                             }
                         }
                     ]
