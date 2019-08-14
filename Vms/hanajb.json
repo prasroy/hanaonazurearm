@@ -29,8 +29,6 @@
         "vNicName": "hanajbnic",
         "PIPName": "hanajbpip",
         "vhdStorageAccountName": "[uniqueString(resourceGroup().id, 'storage')]",
-        "scriptFolder": ".",
-        "scriptParameters": "[concat(' -BaseURI ', parameters('customUri'))]",
     },
     "resources": [
         {

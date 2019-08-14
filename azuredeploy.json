@@ -31,9 +31,8 @@
                 "Standard_M64ms (1.7 TB, Certified)",
                 "Standard_M128s (2 TB, Certified)",
                 "Standard_M128ms (3.8 TB, Certified)",
-                "Standard_E8s_v3 (128 GB)",
+                "Standard_E8s_v3 (64 GB)",
                 "Standard_E16s_v3 (128 GB)",
-                "Standard_E32s_v3 (256 GB)",
                 "Standard_E64s_v3 (448 GB)"
             ]
         },   
@@ -156,21 +155,7 @@
             "description": "This is the name of the availability set to deploy the machine in"
           },
           "defaultValue": "hana-avail"
-        },                    
-        "SubscriptionEmail": {
-          "type": "string",
-          "metadata": {
-            "description": "OS Subscription Email for BYOS, blank for PAYG"
-          },
-          "defaultValue": ""
-        },              
-        "SubscriptionID": {
-          "type": "string",
-          "metadata": {
-            "description": "OS Subscription ID for BYOS, blank for PAYG"
-          },
-          "defaultValue": ""
-        }                             
+        }                            
     },
   "variables": {
     "vmName": "[toLower(parameters('vmName'))]",
@@ -260,7 +245,7 @@
         }
       },
           { 
-            "condition": "[or(or(equals(variables('vmSize'),'Standard_E16s_v3'),equals(variables('vmSize'),'Standard_E32s_v3')), or(equals(variables('vmSize'),'Standard_E64s_v3'),equals(variables('vmSize'),'Standard_GS5')))]",
+            "condition": "[or(or(equals(variables('vmSize'),'Standard_E8s_v3'),equals(variables('vmSize'),'Standard_E16s_v3')), or(equals(variables('vmSize'),'Standard_E64s_v3'),equals(variables('vmSize'),'Standard_GS5')))]",
             "apiVersion": "2016-09-01",
             "name": "[concat('SmallLinkedTemplate', parameters('VMName'))]",
             "type": "Microsoft.Resources/deployments",
@@ -299,13 +284,7 @@
                     },
                     "AvailSetName": {
                         "value": "[parameters('AvailSetName')]"
-                      },                             
-                    "SubscriptionEmail":{
-                        "value": "[parameters('SubscriptionEmail')]"
-                    },
-                    "SubscriptionID":{
-                        "value": "[parameters('SubscriptionID')]"
-                    }
+                      }
                 }
             }
         },
@@ -349,13 +328,7 @@
                     },
                     "AvailSetName": {
                         "value": "[parameters('AvailSetName')]"
-                      },                             
-                    "SubscriptionEmail":{
-                        "value": "[parameters('SubscriptionEmail')]"
-                    },
-                    "SubscriptionID":{
-                        "value": "[parameters('SubscriptionID')]"
-                    }
+                      }
                 }
             }
         },
@@ -399,13 +372,7 @@
                     },
                     "AvailSetName": {
                         "value": "[parameters('AvailSetName')]"
-                      },
-                    "SubscriptionEmail":{
-                        "value": "[parameters('SubscriptionEmail')]"
-                    },
-                    "SubscriptionID":{
-                        "value": "[parameters('SubscriptionID')]"
-                    }           	    
+                      }           	    
                 }
             }
         },
@@ -449,13 +416,7 @@
                     },
                     "AvailSetName": {
                         "value": "[parameters('AvailSetName')]"
-                      },                             
-                    "SubscriptionEmail":{
-                        "value": "[parameters('SubscriptionEmail')]"
-                    },
-                    "SubscriptionID":{
-                        "value": "[parameters('SubscriptionID')]"
-                    }
+                      }
                 }
 	        }
         },

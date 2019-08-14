@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vmName": {
-            "value": "hanadev"
+            "value": "hana-dev"
         },
         "HANAJumpbox": {
             "value": "no"
         },
         "VMSize": {
-            "value": "Standard_E16s_v3 (128 GB)"
+            "value": "Standard_E8s_v3 (64 GB)"
         },
         "NetworkName": {
             "value": "sap-vnet"
