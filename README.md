@@ -7,10 +7,10 @@ The template currently deploys HANA on one of the machines listed in the table b
 
 Machine Size | RAM | Data and Log Disks | /hana/shared | /root | /usr/sap | hana/backup
 ------------ | --- | ------------------ | ------------ | ----- | -------- | -----------
-E16 | 64 GB | 3 x P20 | 1 x E20 | 1 x P4 | 1 x E6 | 1 x E10
-E16 | 128 GB | 3 x P20 | 1 x E20 | 1 x P4 | 1 x E6 | 1 x E15
-E32 | 256 GB | 3 x P20 | 1 x E20 | 1 x P4 | 1 x E6 | 1 x E20
-E64 | 432 GB | 3 x P20 | 1 x E20 | 1 x P4 | 1 x E6 | 1 x E30
+E16 | 64 GB | 4 x P10 | 1 x P6 | 1 x P4 | 1 x P6 | 1 x P10
+E16 | 128 GB | 4 x P10 | 1 x P10 | 1 x P4 | 1 x P6 | 1 x P10
+E32 | 256 GB | 4 x P15 | 1 x P15 | 1 x P4 | 1 x P6 | 1 x P15
+E64 | 432 GB | 4 x P20 | 1 x P20 | 1 x P4 | 1 x P6 | 1 x P20
 
 ### Deploy from Powershell
 
