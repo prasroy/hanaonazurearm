@@ -504,10 +504,10 @@
             },
             "resources": [
                 {
-                    "name": "scriptextension",
-                    "type": "extensions",
+                    "apiVersion": "2015-06-15",
+                    "name": "hanahost-config",
+                    "type": "Extensions",
                     "location": "[resourceGroup().location]",
-                    "apiVersion": "[variables('api-version-vm')]",
                     "dependsOn": [
                         "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
                     ],
@@ -520,7 +520,7 @@
                             "fileUris": [
                                 "[concat(variables('baseUri'),'scripts/allvmsizes.sh')]"
                             ],
-                            "commandToExecute": "[concat('sh allvmsizes.sh \"', parameters('vmUserName'), '\" \"', parameters('vmPassword'),'\" \"',  parameters('vmSize'), '\" \"')]"
+                            "commandToExecute": "sh allvmsizes.sh"
                         }
                     }
                 }

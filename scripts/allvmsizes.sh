@@ -1,7 +1,6 @@
-set -x
-
-vmSize=${7}
-
+#!/bin/bash
+#Author : Prasenjit Roy
+#set -x
 #get the VM size via the instance api
 VMSIZE=`curl -H Metadata:true "http://169.254.169.254/metadata/instance/compute/vmSize?api-version=2017-08-01&format=text"`
 
