@@ -15,6 +15,9 @@
       "value": "hs1-hdb-avset"
     },
     "diagnosticsStorageAccount": {
+      "value": "no"
+    },
+    "diagnosticsStorageAccountName": {
       "value": "prhdb-diag"
     },
     "hasPublicIP": {
