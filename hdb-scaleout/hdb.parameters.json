@@ -23,9 +23,8 @@
     "privateIP": {
       "value": [""]
     },
-    "domainNameLabel":
-    {
-      "value": "az"
+    "domainNameLabel":{
+      "value": false
     },
     "environmentType": {
       "value": "DEV"
