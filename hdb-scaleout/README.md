@@ -9,7 +9,7 @@ You can use the scripts to deploy environments for both development, test, quali
 
 ### **Architectural Diagram**
 
-![Deployment Architecture](Architecture.png)
+![Deployment Architecture](HANA-Scale-out-Architecture.png)
 
 
 ## **Deploy on Azure**
