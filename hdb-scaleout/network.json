@@ -67,7 +67,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameDB'))]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameStorage'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameClient'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameClient'))]"
             ],
             "properties": {
                 "addressSpace": {
@@ -215,8 +215,7 @@
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
                             "priority": 110,
-                            "direction": "Inbound"
-                            
+                            "direction": "Inbound"      
                         }
                     }
                 ]
@@ -252,8 +251,7 @@
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
                             "priority": 110,
-                            "direction": "Inbound"
-                            
+                            "direction": "Inbound"   
                         }
                     }
                 ]
