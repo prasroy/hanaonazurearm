@@ -6,7 +6,7 @@
       "value": "hdbscaleout-vnet"
     },
     "vnetAddressPrefix": {
-      "value": "10.16.0.0/24"
+      "value": "10.17.0.0/24"
     },
     "storageSubnetName": {
       "value": "storage-subnet"
