@@ -248,8 +248,12 @@
             "apiVersion": "2018-10-01",
             "location": "[variables('locationName')]",
             "properties": {
-                "availabilitySet": "[resourceId('Microsoft.Compute/availabilitySets',variables('avSetName'))]",
-                "proximityPlacementGroup": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppgName'))]",
+                "availabilitySet":{
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('avSetName'))]"
+                }, 
+                "proximityPlacementGroup":{
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppgName'))]"
+                },
                 "hardwareProfile": {
                     "vmSize": "[parameters('virtualMachineSize')]"
                 },
