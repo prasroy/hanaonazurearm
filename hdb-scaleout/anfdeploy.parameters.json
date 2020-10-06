@@ -1,6 +1,57 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {   
+  "parameters": {
+    "location": {
+      "value": "[resourceGroup().location]"
+    },
+    "netAppAccountName": {
+      "value": "prsapanfacc"
+    },
+    "netAppPoolName": {
+      "value": "hdbpool"
+    },
+    "poolSizeBytes": {
+      "value": 4398046511104
+    },
+    "netAppVolumeData": {
+      "value": "[concat(parameters('netAppAccountName'), '/', parameters('netAppPoolName'), '/hn1-data')]"
+    },
+    "netAppVolumeLog": {
+      "value": "[concat('volume', uniqueString(resourceGroup().id))]"
+    },
+    "netAppVolumeShared": {
+      "value": "[concat('volume', uniqueString(resourceGroup().id))]"
+    },
+    "anfvolDataSizeBites": {
+      "value": 107374182400
+    },
+    "anfvolLogSizeBites": {
+      "value": 107374182400
+    },
+    "virtualNetworkName": {
+      "value": "hdbscaleout-vnet"
+    },
+    "allowedClients": {
+      "value": "0.0.0.0/0"
+    },
+    "subnetName": {
+      "value": "anf-subnet"
+    },
+    "serviceLevel": {
+      "value": "Premium"
+    },
+    "protocolTypes": {
+      "value": "NFSv4.1"
+    },
+    "unixReadOnly": {
+      "value": null
+    },
+    "unixReadWrite": {
+      "value": true
+    },
+    "snapshotDirectoryVisible": {
+      "value": null
+    }
   }
 }

@@ -32,7 +32,23 @@
         "description": "Size of the capacity pool. The minimum  size is 4 TiB."
       }
     },
-    "netAppVolumeName": {
+    "anfVolumehdbdata": {
+      "defaultValue": "[concat(parameters('netAppAccountName'), '/', parameters('netAppPoolName'), '/hn1-data')]",
+      "type": "String",
+      "metadata": {
+        "description": "Name for the NFS Volume. A volume name must be unique within each capacity pool. It must be at aleast three characters long and you can use any alphanumeric characters."
+      }
+    },
+    "volSizeBytes": {
+      "type": "int",
+      "defaultValue": 107374182400,
+      "minValue": 107374182400,
+      "maxValue": 109951162777600,
+      "metadata": {
+        "description": "Amount of logical storage that is allocated to the volume."
+      }
+    },
+    "anfVolumehdblog": {
       "defaultValue": "[concat('volume', uniqueString(resourceGroup().id))]",
       "type": "String",
       "metadata": {
@@ -128,7 +144,7 @@
   },
   "variables": {
     "capacityPoolName": "[concat(parameters('netAppAccountName'), '/',parameters('netAppPoolName'))]",
-    "volumeName": "[concat(parameters('netAppAccountName'), '/',parameters('netAppPoolName'),'/', parameters('netAppVolumeName'))]"
+    "hdbdatavolumeName": "[concat(parameters('netAppAccountName'), '/', parameters('netAppPoolName'), '/hn1-data')]"
   },
   "resources": [
     {
