@@ -27,7 +27,7 @@
         "value": "10.17.0.128/26"
     },
     "anfSubnetName": {
-        "value": "client-subnet"
+        "value": "anf-subnet"
       },
     "anfSubnetAddressPrefix": {
         "value": "10.17.0.192/26"
