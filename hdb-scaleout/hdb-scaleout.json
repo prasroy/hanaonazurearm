@@ -69,8 +69,16 @@
         "diagnosticsStorageAccount": {
             "type": "string",
             "metadata": {
+                "description": "Do you have existing diagnostics storage account"
+            },
+            "defaultValue": "no"
+        },
+        "diagnosticsStorageAccountName": {
+            "type": "string",
+            "metadata": {
                 "description": "The name of the diagnostics storage account"
-            }
+            },
+            "defaultValue": "hdb-diag"
         },
         "environmentType": {
             "type": "string",
@@ -191,6 +199,40 @@
             ]
         },
         {
+            "condition": "[equals(parameters('diagnosticsStorageAccount'), 'no')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('diagnosticsStorageAccountName')]",
+            "apiVersion": "2019-06-01",
+            "location": "[variables('locationName')]",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "Storage",
+            "properties": {
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                }
+            }
+        },
+        {
             "name": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-pip')]",
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2019-02-01",
@@ -243,7 +285,8 @@
             "name": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
             "dependsOn": [
                 "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
-                "[concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]"
+                "[concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnosticsStorageAccountName'))]"
             ],
             "apiVersion": "2018-10-01",
             "location": "[variables('locationName')]",
@@ -308,7 +351,7 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[concat('https://',parameters('diagnosticsStorageAccount'),'.blob.core.windows.net/')]"
+                        "storageUri": "[concat('https://',parameters('diagnosticsStorageAccountName'),'.blob.core.windows.net/')]"
                     }
                 }
             },
