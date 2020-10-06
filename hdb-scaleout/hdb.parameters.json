@@ -14,11 +14,11 @@
     "availabilitySetName": {
       "value": "hs1-hdb-avset"
     },
-    "diagnosticsStorageAccount": {
-      "value": "no"
+    "existsdiagnosticsStorageAccount": {
+      "value": ""
     },
-    "diagnosticsStorageAccountName": {
-      "value": "prhdb-diag"
+    "diagnstorageNamePrefix": {
+      "value": "prhdb"
     },
     "hasPublicIP": {
       "value": false

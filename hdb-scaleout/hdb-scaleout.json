@@ -66,19 +66,19 @@
             },
             "defaultValue": "HN1"
         },
-        "diagnosticsStorageAccount": {
+        "existsdiagnosticsStorageAccount": {
             "type": "string",
             "metadata": {
-                "description": "Do you have existing diagnostics storage account"
+                "description": "Do you have existing diagnostics storage account otherwise left empty"
             },
-            "defaultValue": "no"
+            "defaultValue": ""
         },
-        "diagnosticsStorageAccountName": {
+        "diagstorageNamePrefix": {
             "type": "string",
             "metadata": {
                 "description": "The name of the diagnostics storage account"
             },
-            "defaultValue": "hdb-diag"
+            "defaultValue": "hdbdiag"
         },
         "environmentType": {
             "type": "string",
@@ -139,6 +139,7 @@
     },
     "variables": {
         "sapSystemIdLower": "[toLower(parameters('sapSystemId'))]",
+        "diagstorageName": "[if(empty(parameters('existsdiagnosticsStorageAccount')),toLower( concat( parameters('diagstorageNamePrefix'), uniqueString(resourceGroup().id) ) ),parameters('diagstorageNamePrefix'))]",
         "locationName": "[if(empty(parameters('location')) , resourceGroup().location,parameters('location'))]",
         "sapMachineName": "[concat(variables('sapSystemIdLower'),'-',parameters('virtualMachineName'))]",
         "avSetName": "[if(empty(parameters('availabilitySetName')), concat(variables('sapSystemIdLower'),'-app-avset'),parameters('availabilitySetName'))]",
@@ -199,9 +200,9 @@
             ]
         },
         {
-            "condition": "[equals(parameters('diagnosticsStorageAccount'), 'no')]",
+            "condition": "[equals(parameters('existsdiagnosticsStorageAccount'), 'no')]",
             "type": "Microsoft.Storage/storageAccounts",
-            "name": "[parameters('diagnosticsStorageAccountName')]",
+            "name": "[variables('diagstorageName')]",
             "apiVersion": "2019-06-01",
             "location": "[variables('locationName')]",
             "sku": {
@@ -286,7 +287,7 @@
             "dependsOn": [
                 "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
                 "[concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnosticsStorageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('diagstorageName'))]"
             ],
             "apiVersion": "2018-10-01",
             "location": "[variables('locationName')]",
@@ -351,7 +352,7 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[concat('https://',parameters('diagnosticsStorageAccountName'),'.blob.core.windows.net/')]"
+                        "storageUri": "[concat('https://',variables('diagstorageName'),'.blob.core.windows.net/')]"
                     }
                 }
             },
