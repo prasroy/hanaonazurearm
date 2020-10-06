@@ -20,6 +20,9 @@
     "hasPublicIP": {
       "value": false
     },
+    "privateIP": {
+      "value": [""]
+    },
     "domainNameLabel":
     {
       "value": "az"
@@ -41,9 +44,6 @@
     },
     "location": {
       "value": "westeurope"
-    },
-    "privateIP": {
-      "value": [""]
     },
     "proximityPlacementGroupName": {
       "value": "hdbscaleout-ppg"
@@ -70,7 +70,7 @@
       "value": "azprwesapsles-rg"
     },
     "virtualMachineTagValues": {
-      "value": { "System": "SAP", "$perfOptimizationLevel": "1" }
+      "value": { "System": "HANA-Scaleout", "$perfOptimizationLevel": "1" }
     }
   }
 }

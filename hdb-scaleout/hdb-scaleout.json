@@ -53,12 +53,6 @@
             },
             "defaultValue": "[resourceGroup().location]"
         },
-        "privateIP": {
-            "type": "array",
-            "defaultValue": [
-                ""
-            ]
-        },
         "proximityPlacementGroupName": {
             "type": "string",
             "defaultValue": "hdb-ppg"
@@ -117,9 +111,11 @@
             ],
             "defaultValue": "Standard_E8s_v3"
         },
+        "privateIP": {
+            "type": "array"
+        },
         "virtualMachineTagValues": {
-            "type": "object",
-            "defaultValue": null
+            "type": "object"
         },
         "virtualNetworkName": {
             "type": "string",
