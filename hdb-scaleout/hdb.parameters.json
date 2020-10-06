@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "adminPasswordOrKey": {
+      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCwj6Xk8BE8mMuZ0vsCJy3S/ziivT0lq0pYPPpK46PAzXB8L24GX0DlSswx52CXPYt8UsTttpfIMBiMuj4eyL6JreT4c0zqDE065DayegSZlk2U26Z8dbSgWgCgcYot781BrLeinLA2SWwBYQ5YyTX3VzrK10QCqTQHa4BHtjXEdmIHggq9rBFwc2tX08mWNgzVmbYFOFC5FknozNaaozJ7668mb+T6yNGwnzpBGDzPvbcygk8P+mDTL26/ohIgDc936FAyk/YivP/VuXjKu+eHyAGMrVVdYl+hJDknuynI9aRo/a2t5RuhLYzhdTZgBE0mqYoDx86p51UJ4ynlAxEV3IeN0FFgUKOMzt7R886OBOJTPhn8Dsz04B3O8wZDrpGWm7wmeC7rFy9rGYj0RG5flLcXmNAfC74HKHf4NBkozyZcxQKQ6CeGOAYTMnIDP17l78FOvNcaxRCJaBDBmt7xgD5cEM0ocEc97ZVNSv+6S0xEZy125aVl/bRpMfAFnTc= Deploy Platform"
+    },
+    "authenticationType": {
+      "value": "sshPublicKey"
+    },
+    "availabilitySetName": {
+      "value": "hs1-hdb-avset"
+    },
+    "diagnosticsStorageAccount": {
+      "value": "[DIAGNOSTICSACCOUNT]"
+    },
+    "hasPublicIP": {
+      "value": "[HASPUBLICIP]"
+    },
+    "domainNameLabel":
+    {
+      "value": "az"
+    },
+    "environmentType": {
+      "value": "DEV"
+    },
+    "publisher": {
+      "value": "SUSE"
+    },
+    "offer": {
+      "value": "SLES-SAP-BYOS"
+    },
+    "sku": {
+      "value": "12-sp4"
+    },
+    "version": {
+      "value": "latest"
+    },
+    "location": {
+      "value": "westeurope"
+    },
+    "privateIP": {
+      "value": [""]
+    },
+    "proximityPlacementGroupName": {
+      "value": "hdbscaleout-ppg"
+    },
+    "sapSystemId": {
+      "value": "HS1"
+    },
+    "subnetName": {
+      "value": "azsapdb-subnet"
+    },
+    "virtualMachineName": {
+      "value": "prhdb"
+    },
+    "virtualMachineSize": {
+      "value": "Standard_E8s_v3"
+    },
+    "virtualMachineCount": {
+      "value": 3
+    },
+    "virtualNetworkName": {
+      "value": "azprwesapsles-vnet"
+    },
+    "virtualNetworkResourceGroupName": {
+      "value": "azprwesapsles-rg"
+    },
+    "virtualMachineTagValues": {
+      "value": { "System": "SAP", "$perfOptimizationLevel": "1" }
+    }
+  }
+}

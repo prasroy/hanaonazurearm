@@ -1,0 +1,397 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPasswordOrKey": {
+            "type": "securestring"
+        },
+        "authenticationType": {
+            "type": "string",
+            "defaultValue": "password",
+            "allowedValues": [
+                "password",
+                "sshPublicKey"
+            ],
+            "metadata": {
+                "description": "Type of authentication to use on the Virtual Machine."
+            }
+        },
+        "availabilitySetName": {
+            "type": "string",
+            "defaultValue": "hdb-scaleout"
+        },
+        "publisher": {
+            "type": "string",
+            "defaultValue": "SUSE"
+        },
+        "offer": {
+            "type": "string",
+            "defaultValue": "SLES-SAP-BYOS"
+        },
+        "sku": {
+            "type": "string",
+            "defaultValue": "12-sp4"
+        },
+        "version": {
+            "type": "string",
+            "defaultValue": "latest"
+        },
+        "hasPublicIP": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "domainNameLabel": {
+            "type": "bool"
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "The location of the resource"
+            },
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "privateIP": {
+            "type": "array",
+            "defaultValue": [
+                ""
+            ]
+        },
+        "proximityPlacementGroupName": {
+            "type": "string",
+            "defaultValue": "hdb-ppg"
+        },
+        "sapSystemId": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3,
+            "metadata": {
+                "description": "The SAP System ID"
+            },
+            "defaultValue": "HN1"
+        },
+        "diagnosticsStorageAccount": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the diagnostics storage account"
+            }
+        },
+        "environmentType": {
+            "type": "string",
+            "defaultValue": "PRD",
+            "allowedValues": [
+                "DEV",
+                "QA",
+                "PRD",
+                "SBX",
+                "TST"
+            ]
+        },
+        "subnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the subnet"
+            },
+            "defaultValue": "azsapdb-subnet"
+        },
+        "virtualMachineCount": {
+            "type": "int",
+            "defaultValue": 3
+        },
+        "virtualMachineName": {
+            "type": "string",
+            "defaultValue": "prhdb"
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_E8s_v3",
+                "Standard_E16s_v3",
+                "Standard_E20s_v3",
+                "Standard_E32s_v3",
+                "Standard_E8ds_v4",
+                "Standard_E16ds_v4",
+                "Standard_E20ds_v4"
+            ],
+            "defaultValue": "Standard_E8s_v3"
+        },
+        "virtualMachineTagValues": {
+            "type": "object",
+            "defaultValue": null
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the vnet"
+            },
+            "defaultValue": "azprwesapsles-vnet"
+        },
+        "virtualNetworkResourceGroupName": {
+            "type": "string",
+            "defaultValue": "azprwesapsles-rg"
+        }
+    },
+    "variables": {
+        "sapSystemIdLower": "[toLower(parameters('sapSystemId'))]",
+        "locationName": "[if(empty(parameters('location')) , resourceGroup().location,parameters('location'))]",
+        "sapMachineName": "[concat(variables('sapSystemIdLower'),'-',parameters('virtualMachineName'))]",
+        "avSetName": "[if(empty(parameters('availabilitySetName')), concat(variables('sapSystemIdLower'),'-app-avset'),parameters('availabilitySetName'))]",
+        "ppgName": "[if(empty(parameters('proximityPlacementGroupName')), concat(variables('sapSystemIdLower'),'-ppg'),parameters('proximityPlacementGroupName'))]",
+        "vnetID": "[resourceid(parameters('virtualNetworkResourceGroupName') ,'Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+                "publicKeys": [
+                    {
+                        "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                        "keyData": "[parameters('adminPasswordOrKey')]"
+                    }
+                ]
+            }
+        },
+        "sidTag": {
+            "SID": "[parameters('sapSystemId')]"
+        },
+        "envTag": {
+            "Environment": "[parameters('environmentType')]"
+        },
+        "allVMTags": "[union(parameters('virtualMachineTagValues'),variables('sidTag'),variables('envTag'))]",
+        "github": "https://raw.githubusercontent.com/Azure/SAP-on-Azure-Scripts-and-Utilities/master/ARMTemplates/serverTemplates/",
+        "diskSizes": {
+            "HDB": {
+                "osdiskSizeGB": 64,
+                "nrDisks": 1
+            }
+        },
+        "nrOfDisks": "[variables('diskSizes')['HDB'].nrDisks]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2018-04-01",
+            "type": "Microsoft.Compute/proximityPlacementGroups",
+            "name": "[variables('ppgName')]",
+            "location": "[variables('locationName')]"
+        },
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[variables('avSetName')]",
+            "apiVersion": "2018-10-01",
+            "location": "[variables('locationName')]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "properties": {
+                "platformFaultDomainCount": 3,
+                "platformUpdateDomainCount": 10,
+                "proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',concat(variables('ppgName')))]"
+                }
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/proximityPlacementGroups/', concat(variables('ppgName')))]"
+            ]
+        },
+        {
+            "name": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-pip')]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2019-02-01",
+            "location": "[variables('locationName')]",
+            "condition": "[parameters('hasPublicIP')]",
+            "properties": {
+                "publicIpAllocationMethod": "Static",
+                "dnsSettings": "[if(parameters('domainNameLabel'),json(concat('{\"domainNameLabel\":\"',concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0')),'\"}')),json('null'))]"
+            },
+            "sku": {
+                "name": "Standard"
+            },
+            "copy": {
+                "count": "[parameters('virtualMachineCount')]",
+                "name": "pipLoop"
+            }
+        },
+        {
+            "name": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-07-01",
+            "location": "[variables('locationName')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIpAddresses/', concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-pip'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]",
+                            "primary": true,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "enableAcceleratedNetworking": true
+            },
+            "copy": {
+                "count": "[parameters('virtualMachineCount')]",
+                "name": "nicLoop"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
+            "dependsOn": [
+                "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
+                "[concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]"
+            ],
+            "apiVersion": "2018-10-01",
+            "location": "[variables('locationName')]",
+            "properties": {
+                "availabilitySet": "[resourceId('Microsoft.Compute/availabilitySets/',concat(variables('avSetName')))]",
+                "proximityPlacementGroup": "[resourceId('Microsoft.Compute/proximityPlacementGroups',concat(variables('ppgName')))]",
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPasswordOrKey')]",
+                    "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[ parameters('publisher')]",
+                        "offer": "[parameters('offer')]",
+                        "sku": "[parameters('sku')]",
+                        "version": "[parameters('version')]"
+                    },
+                    "osDisk": {
+                        "name": "[concat(variables('sapMachineName'),'-', padLeft(copyIndex(1),2,'0'), '-osdisk')]",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage",
+                        "diskSizeGB": "[if(startsWith(toLower(parameters('publisher')),'microsoft') ,127, 32)]",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS"
+
+                        }
+                    },
+                    "copy": [
+                        {
+                            "name": "dataDisks",
+                            "count": "[variables('nrOfDisks')]",
+                            "input": {
+
+                                "lun": "[reference(concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))).outputs.diskArray.value[copyIndex('dataDisks')].lun]",
+                                "createOption": "[reference(concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))).outputs.diskArray.value[copyIndex('dataDisks')].createOption]",
+                                "diskSizeGB": "[reference(concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))).outputs.diskArray.value[copyIndex('dataDisks')].properties.diskSizeGB]",
+                                "caching": "[reference(concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))).outputs.diskArray.value[copyIndex('dataDisks')].caching]",
+                                "writeAcceleratorEnabled": "[reference(concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))).outputs.diskArray.value[copyIndex('dataDisks')].writeAcceleratorEnabled]",
+                                "managedDisk": {
+                                    "id": "[resourceId('Microsoft.Compute/disks', concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'),reference(concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))).outputs.diskArray.value[copyIndex('dataDisks')].name))]"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://',parameters('diagnosticsStorageAccount'),'.blob.core.windows.net/')]"
+                    }
+                }
+            },
+            "copy": {
+                "count": "[parameters('virtualMachineCount')]",
+                "name": "vmLoop"
+            },
+
+            "tags": "[variables('allVMTags')]"
+        },
+        {
+            "name": "[concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "copy": {
+                "name": "vmLoop",
+                "count": "[parameters('virtualMachineCount')]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('github'),'/disks/VMDisks.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+
+                "parameters": {
+                    "machineName": {
+                        "value": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]"
+                    },
+                    "machineSize": {
+                        "value": "APP"
+                    },
+                    "location": {
+                        "value": "[variables('locationName')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[concat('Update-IP-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2016-09-01",
+            "dependsOn": [
+                "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]"
+            ],
+            "condition": "[not(empty(parameters('privateIP')[0]))]",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/networkInterfaces",
+                            "name": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
+                            "apiVersion": "2019-06-01",
+                            "location": "[parameters('location')]",
+                            "condition": "[parameters('hasPublicIP')]",
+                            "properties": {
+                                "ipConfigurations": [
+                                    {
+                                        "name": "ipconfig1",
+                                        "properties": {
+                                            "privateIPAllocationMethod": "[if(empty(parameters('privateIP')) ,'Dynamic','Static')]",
+                                            "privateIPAddress": "[if(empty(parameters('privateIP')) ,'',parameters('privateIP')[copyIndex()])]",
+                                            "subnet": {
+                                                "id": "[variables('subnetRef')]"
+                                            },
+                                            "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            "copy": {
+                "name": "updateIPLoop",
+                "count": "[parameters('virtualMachineCount')]"
+            }
+        }
+    ],
+    "outputs": {
+    }
+}
