@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworkName": {
+      "value": "hdbscaleout-vnet"
+    },
+    "vnetAddressPrefix": {
+      "value": "10.16.0.0/24"
+    },
+    "storageSubnetName": {
+      "value": "storage-subnet"
+    },
+    "storageSubnetAddressPrefix": {
+      "value": "10.17.0.0/26"
+    },
+    "dbSubnetName": {
+      "value": "db-subnet"
+    },
+    "dbSubnetAddressPrefix": {
+      "value": "10.17.0.64/26"
+    },
+    "clientSubnetName": {
+        "value": "client-subnet"
+      },
+    "clientSubnetAddressPrefix": {
+        "value": "10.17.0.128/26"
+    },
+    "anfSubnetName": {
+        "value": "client-subnet"
+      },
+    "anfSubnetAddressPrefix": {
+        "value": "10.17.0.192/26"
+    },
+    "location": {
+      "value": "westeurope"
+    },
+    "networkSecurityGroupNameDB": {
+        "value": "hdb-nsg"
+    },
+    "networkSecurityGroupNameStorage": {
+        "value": "storage-nsg"
+    },
+      "networkSecurityGroupNameClient": {
+        "value": "client-nsg"
+    },
+    "networkSecurityGroupNameANF": {
+        "value": "anf-nsg"
+    }
+  }
+}

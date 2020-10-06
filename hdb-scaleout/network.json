@@ -1,0 +1,360 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworkName": {
+            "defaultValue": "demo-vnet",
+            "type": "String"
+        },
+        "vnetAddressPrefix": {
+            "type": "String"
+        },
+        "storageSubnetName": {
+            "type": "String",
+            "defaultValue": "storage-subnet"
+        },
+        "storageSubnetAddressPrefix": {
+            "type": "String"
+        },
+        "dbSubnetName": {
+            "type": "String",
+            "defaultValue": "db-subnet"
+        },
+        "dbSubnetAddressPrefix": {
+            "type": "String"
+        },
+        "clientSubnetName": {
+            "type": "String",
+            "defaultValue": "client-subnet"
+        },
+        "clientSubnetAddressPrefix": {
+            "type": "String"
+        },
+        "anfSubnetName": {
+            "type": "String",
+            "defaultValue": "anf-subnet"
+        },
+        "anfSubnetAddressPrefix": {
+            "type": "String"
+        },
+        "networkSecurityGroupNameDB": {
+            "type": "String",
+            "defaultValue": "toplevel"
+        },
+        "networkSecurityGroupNameStorage": {
+            "type": "String",
+            "defaultValue": "toplevel"
+        },
+        "networkSecurityGroupNameClient": {
+            "type": "String",
+            "defaultValue": "toplevel"
+        },
+        "networkSecurityGroupNameANF": {
+            "type": "String",
+            "defaultValue": "toplevel"
+        },
+        "location": {
+            "defaultValue": "[resourceGroup().location]",
+            "type": "String"
+        }
+    },
+    "variables": {
+        "locationName": "[if(empty(parameters('location')) , resourceGroup().location,parameters('location'))]"
+    },
+    "resources": [
+        
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-11-01",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[variables('locationName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameDB'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameStorage'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameClient'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameANF'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('vnetaddressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('dbSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('dbSubnetAddressPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameDB'))]"
+                            },
+                            "serviceEndpoints": [
+                            ],
+                            "delegations": [
+                            ],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "[parameters('storageSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('storageSubnetAddressPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameStorage'))]"
+                            },
+                            "serviceEndpoints": [
+                            ],
+                            "delegations": [
+                            ],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+
+                    },
+                    {
+                        "name": "[parameters('clientSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('clientSubnetAddressPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameClient'))]"
+                            },
+                            "serviceEndpoints": [
+                            ],
+                            "delegations": [
+                            ],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "[parameters('anfSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('anfSubnetAddressPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameANF'))]"
+                            },
+                            "serviceEndpoints": [
+                            ],
+                            "delegations": [
+                                {
+                                    "name":"NetAppDelegation",
+                                    "properties": {
+                                        "serviceName": "Microsoft.Netapp/volumes"
+                                    }
+                                }
+                                
+                            ],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    }
+                ],
+                "virtualNetworkPeerings": [
+                ],
+                "enableDdosProtection": false,
+                "enableVmProtection": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-11-01",
+            "name": "[parameters('networkSecurityGroupNameStorage')]",
+            "location": "[variables('locationName')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Allow_SSH",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [
+                            ],
+                            "destinationPortRanges": [
+                            ],
+                            "sourceAddressPrefixes": [
+                            ],
+                            "destinationAddressPrefixes": [
+                            ]
+                        }
+                    },
+                    {
+                        "name": "Port_30015",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "30015",
+                            "access": "Allow",
+                            "priority": 110,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [
+                            ],
+                            "destinationPortRanges": [
+                            ],
+                            "sourceAddressPrefixes": [
+                            ],
+                            "destinationAddressPrefixes": [
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-11-01",
+            "name": "[parameters('networkSecurityGroupNameDB')]",
+            "location": "[variables('locationName')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Allow_SSH",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [
+                            ],
+                            "destinationPortRanges": [
+                            ],
+                            "sourceAddressPrefixes": [
+                            ],
+                            "destinationAddressPrefixes": [
+                            ]
+                        }
+                    },
+                    {
+                        "name": "Port_30015",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "30015",
+                            "access": "Allow",
+                            "priority": 110,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [
+                            ],
+                            "destinationPortRanges": [
+                            ],
+                            "sourceAddressPrefixes": [
+                            ],
+                            "destinationAddressPrefixes": [
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-11-01",
+            "name": "[parameters('networkSecurityGroupNameClient')]",
+            "location": "[variables('locationName')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Allow_SSH",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [
+                            ],
+                            "destinationPortRanges": [
+                            ],
+                            "sourceAddressPrefixes": [
+                            ],
+                            "destinationAddressPrefixes": [
+                            ]
+                        }
+                    },
+                    {
+                        "name": "Port_30015",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "30015",
+                            "access": "Allow",
+                            "priority": 110,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [
+                            ],
+                            "destinationPortRanges": [
+                            ],
+                            "sourceAddressPrefixes": [
+                            ],
+                            "destinationAddressPrefixes": [
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-11-01",
+            "name": "[parameters('networkSecurityGroupNameANF')]",
+            "location": "[variables('locationName')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Allow_SSH",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [
+                            ],
+                            "destinationPortRanges": [
+                            ],
+                            "sourceAddressPrefixes": [
+                            ],
+                            "destinationAddressPrefixes": [
+                            ]
+                        }
+                    },
+                    {
+                        "name": "Port_30015",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "30015",
+                            "access": "Allow",
+                            "priority": 110,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [
+                            ],
+                            "destinationPortRanges": [
+                            ],
+                            "sourceAddressPrefixes": [
+                            ],
+                            "destinationAddressPrefixes": [
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
