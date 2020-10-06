@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "machineName": {
@@ -13,13 +13,13 @@
             "metadata": {
                 "description": "The location of the resource"
             },
-            "defaultValue": ""
+            "defaultValue": "westeurope"
         }
         }
     },
     "variables": {
         "diskSizes": {
-            "APP": {
+            "HDB": {
                 "disks": [
                     {
                         "lun": 0,
@@ -27,11 +27,11 @@
                         "caching": "ReadWrite",
                         "writeAcceleratorEnabled": false,
                         "id": null,
-                        "name": "-data01",
+                        "name": "-usr_sap",
                         "storageAccountType": null,
-                        "sku": "Premium_LRS",
+                        "sku": "StandardSSD_LRS",
                         "properties": {
-                            "diskSizeGB": 127,
+                            "diskSizeGB": 64,
                             "creationData": {
                                 "createOption": "empty"
                             }
