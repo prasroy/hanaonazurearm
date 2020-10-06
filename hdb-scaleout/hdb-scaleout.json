@@ -339,7 +339,7 @@
                         "value": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]"
                     },
                     "machineSize": {
-                        "value": "APP"
+                        "value": "HDB"
                     },
                     "location": {
                         "value": "[variables('locationName')]"
