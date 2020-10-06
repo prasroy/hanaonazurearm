@@ -43,9 +43,6 @@
     },
       "networkSecurityGroupNameClient": {
         "value": "client-nsg"
-    },
-    "networkSecurityGroupNameANF": {
-        "value": "anf-nsg"
     }
   }
 }
