@@ -126,8 +126,6 @@
                         "name": "[parameters('anfSubnetName')]",
                         "properties": {
                             "addressPrefix": "[parameters('anfSubnetAddressPrefix')]",
-                            "serviceEndpoints": [
-                            ],
                             "delegations": [
                                 {
                                     "name":"NetAppDelegation",
