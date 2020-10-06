@@ -34,10 +34,10 @@
       "value": "SUSE"
     },
     "offer": {
-      "value": "SLES-SAP-BYOS"
+      "value": "sles-sap-15-sp2-byos"
     },
     "sku": {
-      "value": "12-sp4"
+      "value": "gen1"
     },
     "version": {
       "value": "latest"
