@@ -200,7 +200,7 @@
             ]
         },
         {
-            "condition": "[equals(parameters('existsdiagnosticsStorageAccount'), 'no')]",
+            "condition": "[equals(parameters('existsdiagnosticsStorageAccount'),'')]",
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[variables('diagstorageName')]",
             "apiVersion": "2019-06-01",
