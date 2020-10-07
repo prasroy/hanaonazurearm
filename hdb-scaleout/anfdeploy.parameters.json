@@ -6,10 +6,10 @@
       "value": "westeurope"
     },
     "anfAccountName": {
-      "value": ""
+      "value": "azpranf"
     },
     "anfPoolName": {
-      "value": "pranfhdbpool"
+      "value": "hdb00"
     },
     "poolSizeBytes": {
       "value": 4398046511104

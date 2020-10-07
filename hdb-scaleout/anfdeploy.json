@@ -146,14 +146,17 @@
   "variables": {
     "anfAcclocation": "[if(empty(parameters('location')) , resourceGroup().location,parameters('location'))]",
     "anfAccName": "[if(empty(parameters('anfAccountName')), concat('sapanfacc', uniqueString(resourceGroup().id)),parameters('anfAccountName'))]",
-    "capacityPoolName": "[if(empty(parameters('anfPoolName')),concat(variables('anfAccName'), '/','hdbpool'), parameters('anfPoolName'))]",
-    "hdbDataVolName": "[concat(toUpper(parameters('HANASystemId')), '-', 'data-mnt00001')]",
-    "hdbLogVolName": "[concat(toUpper(parameters('HANASystemId')), '-', 'log-mnt00001')]",
-    "hdbSharedVolName": "[concat(toUpper(parameters('HANASystemId')), '-', 'shared')]"
+    "anfPoolSuffix": "[if(empty(parameters('anfPoolName')), 'hdbpool', parameters('anfPoolName'))]",
+    "anfhdbPool": "[if(empty(parameters('anfPoolName')), concat(variables('anfAccName'), '/', variables('anfPoolSuffix')), concat(variables('anfAccName'), '/', variables('anfPoolSuffix')))]",
+    "hdbDataMountPath": "[concat(toUpper(parameters('HANASystemId')), '-', 'data-mnt00001')]",
+    "hdbDataVolName": "[concat(variables('anfhdbPool'), '/', variables('hdbDataMountPath') )]",
+    "hdbLogMountPath": "[concat(toUpper(parameters('HANASystemId')), '-', 'log-mnt00001')]",
+    "hdbLogVolName": "[concat( variables('anfhdbPool'), '/', variables('hdbLogMountPath'))]",
+    "hdbSharedMountPath": "[concat(toUpper(parameters('HANASystemId')), '-', 'shared')]",
+    "hdbSharedVolName": "[concat(variables('anfhdbPool'), '/', variables('hdbSharedMountPath'))]"
   },
   "resources": [
     {
-      "condition": "[equals(parameters('anfAccountName'),'')]",
       "type": "Microsoft.NetApp/netAppAccounts",
       "apiVersion": "2020-06-01",
       "name": "[variables('anfAccName')]",
@@ -163,11 +166,11 @@
     {
       "type": "Microsoft.NetApp/netAppAccounts/capacityPools",
       "apiVersion": "2020-06-01",
-      "name": "[variables('capacityPoolName')]",
+      "name": "[variables('anfhdbPool')]",
       "location": "[variables('anfAcclocation')]",
       "dependsOn": [
-        "[resourceId('Microsoft.NetApp/netAppAccounts', variables('anfAccName'))]"
-      ],
+                "[resourceId('Microsoft.NetApp/netAppAccounts', variables('anfAccName'))]"
+            ],
       "properties": {
         "serviceLevel": "[parameters('serviceLevel')]",
         "size": "[parameters('poolSizeBytes')]"
@@ -179,12 +182,11 @@
       "name": "[variables('hdbDatavolName')]",
       "location": "[variables('anfAcclocation')]",
       "dependsOn": [
-        "[resourceId('Microsoft.NetApp/netAppAccounts/capacityPools', variables('anfAccName'), variables('capacityPoolName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+        "[resourceId('Microsoft.NetApp/netAppAccounts/capacityPools', variables('anfAccName'), variables('anfPoolSuffix'))]"
       ],
       "properties": {
         "serviceLevel": "[parameters('serviceLevel')]",
-        "creationToken": "[variables('hdbDataVolName')]",
+        "creationToken": "[variables('hdbDataMountPath')]",
         "usageThreshold": "[parameters('DataVolSizeBytes')]",
         "exportPolicy": {
           "rules": [
@@ -212,12 +214,11 @@
       "name": "[variables('hdbLogvolName')]",
       "location": "[variables('anfAcclocation')]",
       "dependsOn": [
-        "[resourceId('Microsoft.NetApp/netAppAccounts/capacityPools', variables('anfAccName'), variables('capacityPoolName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+        "[resourceId('Microsoft.NetApp/netAppAccounts/capacityPools', variables('anfAccName'), variables('anfPoolSuffix'))]"
       ],
       "properties": {
         "serviceLevel": "[parameters('serviceLevel')]",
-        "creationToken": "[variables('hdbLogVolName')]",
+        "creationToken": "[variables('hdbLogMountPath')]",
         "usageThreshold": "[parameters('LogVolSizeBytes')]",
         "exportPolicy": {
           "rules": [
@@ -245,12 +246,11 @@
       "name": "[variables('hdbSharedvolName')]",
       "location": "[variables('anfAcclocation')]",
       "dependsOn": [
-        "[resourceId('Microsoft.NetApp/netAppAccounts/capacityPools', variables('anfAccName'), variables('capacityPoolName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+        "[resourceId('Microsoft.NetApp/netAppAccounts/capacityPools', variables('anfAccName'), variables('anfPoolSuffix'))]"
       ],
       "properties": {
         "serviceLevel": "[parameters('serviceLevel')]",
-        "creationToken": "[variables('hdbSharedVolName')]",
+        "creationToken": "[variables('hdbSharedMountPath')]",
         "usageThreshold": "[parameters('SharedVolSizeBytes')]",
         "exportPolicy": {
           "rules": [
