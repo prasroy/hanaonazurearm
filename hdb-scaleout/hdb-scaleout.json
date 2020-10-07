@@ -25,11 +25,20 @@
         },
         "publisher": {
             "type": "string",
-            "defaultValue": "SUSE"
+            "allowedValues": [
+                "SUSE",
+                "RedHat"
+            ],
+            "metadata": {
+                "description": "Provide the publisher of the OS Image"
+            }   
         },
         "offer": {
             "type": "string",
-            "defaultValue": "SLES-SAP-BYOS"
+            "defaultValue": "SLES-SAP-BYOS",
+             "metadata": {
+                "description": "Provide the Offer of the OS Image"
+            } 
         },
         "sku": {
             "type": "string",

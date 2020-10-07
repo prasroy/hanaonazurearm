@@ -3,12 +3,12 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "value": "[resourceGroup().location]"
+      "value": "westeurope"
     },
-    "netAppAccountName": {
+    "anfAccountName": {
       "value": "prsapanfacc"
     },
-    "netAppPoolName": {
+    "anfPoolName": {
       "value": "hdbpool"
     },
     "poolSizeBytes": {

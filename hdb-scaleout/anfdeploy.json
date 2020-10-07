@@ -4,19 +4,17 @@
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Same Location of resource group for all resources in the same deployment."
       }
     },
-    "netAppAccountName": {
-      "defaultValue": "[concat('sapanfacc', uniqueString(resourceGroup().id))]",
+    "anfAccountName": {
       "type": "String",
       "metadata": {
         "description": "Name for the Account. The account name must be unique within the subscription"
       }
     },
-    "netAppPoolName": {
+    "anfPoolName": {
       "defaultValue": "[concat('hdbpool', uniqueString(resourceGroup().id))]",
       "type": "String",
       "metadata": {
@@ -29,39 +27,43 @@
       "minValue": 4398046511104,
       "maxValue": 549755813888000,
       "metadata": {
-        "description": "Size of the capacity pool. The minimum  size is 4 TiB."
+        "description": "Size of the capacity pool. The minimum  size is 4 TiB and maximun size is 50 TiB"
       }
     },
-    "anfVolumehdbdata": {
-      "defaultValue": "[concat(parameters('netAppAccountName'), '/', parameters('netAppPoolName'), '/hn1-data')]",
-      "type": "String",
-      "metadata": {
-        "description": "Name for the NFS Volume. A volume name must be unique within each capacity pool. It must be at aleast three characters long and you can use any alphanumeric characters."
-      }
-    },
-    "volSizeBytes": {
+    "HANASystemId": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3,
+            "metadata": {
+                "description": "The SAP System ID"
+            },
+            "defaultValue": "HS1"
+        },
+    "DataVolSizeBytes": {
       "type": "int",
       "defaultValue": 107374182400,
       "minValue": 107374182400,
       "maxValue": 109951162777600,
       "metadata": {
-        "description": "Amount of logical storage that is allocated to the volume."
+        "description": "Amount of logical storage that is allocated to the HANA Data volume."
       }
     },
-    "anfVolumehdblog": {
-      "defaultValue": "[concat('volume', uniqueString(resourceGroup().id))]",
-      "type": "String",
-      "metadata": {
-        "description": "Name for the NFS Volume. A volume name must be unique within each capacity pool. It must be at aleast three characters long and you can use any alphanumeric characters."
-      }
-    },
-    "volSizeBytes": {
+    "LogVolSizeBytes": {
       "type": "int",
       "defaultValue": 107374182400,
       "minValue": 107374182400,
       "maxValue": 109951162777600,
       "metadata": {
-        "description": "Amount of logical storage that is allocated to the volume."
+        "description": "Amount of logical storage that is allocated to the HANA Log volume."
+      }
+    },
+    "SharedVolSizeBytes": {
+      "type": "int",
+      "defaultValue": 107374182400,
+      "minValue": 107374182400,
+      "maxValue": 109951162777600,
+      "metadata": {
+        "description": "Amount of logical storage that is allocated to the HANA Shared volume."
       }
     },
     "virtualNetworkName": {
@@ -143,24 +145,28 @@
     }
   },
   "variables": {
-    "capacityPoolName": "[concat(parameters('netAppAccountName'), '/',parameters('netAppPoolName'))]",
-    "hdbdatavolumeName": "[concat(parameters('netAppAccountName'), '/', parameters('netAppPoolName'), '/hn1-data')]"
+    "anfAcclocation": "[if(empty(parameters('location')) , resourceGroup().location,parameters('location'))]",
+    "anfAccName": "[if(empty(parameters('anfAccountName')), concat('sapanfacc', uniqueString(resourceGroup().id)),parameters('anfAccountName'))]",
+    "capacityPoolName": "[if(empty(parameters('anfPoolName')),concat(variables('anfAccName'), '/','hdbpool'), parameters('anfPoolName'))]",
+    "hdbDataVolName": "[concat(toUpper(parameters('HANASystemId')), '-', 'data-mnt00001')]",
+    "hdbLogVolName": "[concat(toUpper(parameters('HANASystemId')), '-', 'log-mnt00001')]",
+    "hdbSharedVolName": "[concat(toUpper(parameters('HANASystemId')), '-', 'shared')]"
   },
   "resources": [
     {
       "type": "Microsoft.NetApp/netAppAccounts",
       "apiVersion": "2020-06-01",
-      "name": "[parameters('netAppAccountName')]",
-      "location": "[parameters('location')]",
+      "name": "[variables('anfAccName')]",
+      "location": "[variables('anfAcclocation')]",
       "properties": {}
     },
     {
       "type": "Microsoft.NetApp/netAppAccounts/capacityPools",
       "apiVersion": "2020-06-01",
       "name": "[variables('capacityPoolName')]",
-      "location": "[parameters('location')]",
+      "location": "[variables('anfAcclocation')]",
       "dependsOn": [
-        "[resourceId('Microsoft.NetApp/netAppAccounts', parameters('netAppAccountName'))]"
+        "[resourceId('Microsoft.NetApp/netAppAccounts', variables('anfAccName'))]"
       ],
       "properties": {
         "serviceLevel": "[parameters('serviceLevel')]",
@@ -170,16 +176,82 @@
     {
       "type": "Microsoft.NetApp/netAppAccounts/capacityPools/volumes",
       "apiVersion": "2020-06-01",
-      "name": "[variables('volumeName')]",
-      "location": "[parameters('location')]",
+      "name": "[variables('hdbDatavolName')]",
+      "location": "[variables('anfAcclocation')]",
       "dependsOn": [
-        "[resourceId('Microsoft.NetApp/netAppAccounts/capacityPools', parameters('netAppAccountName'), parameters('netAppPoolName'))]",
+        "[resourceId('Microsoft.NetApp/netAppAccounts/capacityPools', variables('anfAccName'), variables('capacityPoolName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
       ],
       "properties": {
         "serviceLevel": "[parameters('serviceLevel')]",
-        "creationToken": "[parameters('netAppVolumeName')]",
-        "usageThreshold": "[parameters('volSizeBytes')]",
+        "creationToken": "[variables('hdbDataVolName')]",
+        "usageThreshold": "[parameters('DataVolSizeBytes')]",
+        "exportPolicy": {
+          "rules": [
+            {
+              "ruleIndex": 1,
+              "unixReadOnly": "[parameters('unixReadOnly')]",
+              "unixReadWrite": "[parameters('unixReadWrite')]",
+              "cifs": false,
+              "nfsv3": "[if(equals( parameters('protocolTypes'), 'NFSv3'),bool('true'),bool('false'))]",
+              "nfsv41": "[if(equals(parameters('protocolTypes'), 'NFSv4.1'),bool('true'),bool('false'))]",
+              "allowedClients": "[parameters('allowedClients')]"
+            }
+          ]
+        },
+        "protocolTypes": [
+          "[parameters('protocolTypes')]"
+        ],
+        "subnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+        "snapshotDirectoryVisible": "[parameters('snapshotDirectoryVisible')]"
+      }
+    },
+    {
+      "type": "Microsoft.NetApp/netAppAccounts/capacityPools/volumes",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('hdbLogvolName')]",
+      "location": "[variables('anfAcclocation')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.NetApp/netAppAccounts/capacityPools', variables('anfAccName'), variables('capacityPoolName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "serviceLevel": "[parameters('serviceLevel')]",
+        "creationToken": "[variables('hdbLogVolName')]",
+        "usageThreshold": "[parameters('LogVolSizeBytes')]",
+        "exportPolicy": {
+          "rules": [
+            {
+              "ruleIndex": 1,
+              "unixReadOnly": "[parameters('unixReadOnly')]",
+              "unixReadWrite": "[parameters('unixReadWrite')]",
+              "cifs": false,
+              "nfsv3": "[if(equals( parameters('protocolTypes'), 'NFSv3'),bool('true'),bool('false'))]",
+              "nfsv41": "[if(equals(parameters('protocolTypes'), 'NFSv4.1'),bool('true'),bool('false'))]",
+              "allowedClients": "[parameters('allowedClients')]"
+            }
+          ]
+        },
+        "protocolTypes": [
+          "[parameters('protocolTypes')]"
+        ],
+        "subnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+        "snapshotDirectoryVisible": "[parameters('snapshotDirectoryVisible')]"
+      }
+    },
+    {
+      "type": "Microsoft.NetApp/netAppAccounts/capacityPools/volumes",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('hdbSharedvolName')]",
+      "location": "[variables('anfAcclocation')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.NetApp/netAppAccounts/capacityPools', variables('anfAccName'), variables('capacityPoolName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "serviceLevel": "[parameters('serviceLevel')]",
+        "creationToken": "[variables('hdbSharedVolName')]",
+        "usageThreshold": "[parameters('SharedVolSizeBytes')]",
         "exportPolicy": {
           "rules": [
             {
