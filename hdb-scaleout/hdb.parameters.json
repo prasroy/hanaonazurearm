@@ -17,7 +17,7 @@
     "existsdiagnosticsStorageAccount": {
       "value": ""
     },
-    "diagnstorageNamePrefix": {
+    "diagstorageNamePrefix": {
       "value": "prhdb"
     },
     "hasPublicIP": {

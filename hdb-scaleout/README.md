@@ -1,4 +1,4 @@
-# HANA Scale-Out on Azure with Azure NetAPP File (ANF)
+# HANA Scale-Out deployment on Azure with Azure NetAPP Files (ANF)
 The template currently deploys three HANA Virtual machines with one managed disk attached.
 
 ## **Deployment options and Supported operating systems**
