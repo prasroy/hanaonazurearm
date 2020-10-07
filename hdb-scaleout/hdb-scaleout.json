@@ -54,11 +54,11 @@
         },
         "storageNICprefix": {
             "type": "string",
-            "defaultValue": "[concat(variables('sapMachineName'), '-storage')]"
+            "defaultValue": "[concat(toLower(parameters('sapSystemId')), '-storage')]"
         },
         "ClientNICprefix": {
             "type": "string",
-            "defaultValue": "[concat(variables('sapMachineName'), '-client')]"
+            "defaultValue": "[concat(toLower(parameters('sapSystemId')), '-client')]"
         },
         "domainNameLabel": {
             "type": "bool"
@@ -432,13 +432,16 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]",
+                            "primary": true
                         },
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('storageNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('storageNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]",
+                            "primary": false
                         },
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('ClientNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('ClientNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]",
+                            "primary": false
                         }
                     ]
                 },
@@ -510,6 +513,7 @@
                                         "name": "ipconfig1",
                                         "properties": {
                                             "privateIPAllocationMethod": "[if(empty(parameters('privateIP')) ,'Dynamic','Static')]",
+                                            "primary": true,
                                             "privateIPAddress": "[if(empty(parameters('privateIP')) ,'',parameters('privateIP')[copyIndex()])]",
                                             "subnet": {
                                                 "id": "[variables('dbsubnetRef')]"
