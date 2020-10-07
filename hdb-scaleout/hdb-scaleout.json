@@ -52,6 +52,14 @@
             "type": "bool",
             "defaultValue": false
         },
+        "storageNICprefix": {
+            "type": "string",
+            "defaultValue": "[concat(variables('sapMachineName'), '-storage')]"
+        },
+        "ClientNICprefix": {
+            "type": "string",
+            "defaultValue": "[concat(variables('sapMachineName'), '-client')]"
+        },
         "domainNameLabel": {
             "type": "bool"
         },
@@ -100,10 +108,24 @@
                 "TST"
             ]
         },
-        "subnetName": {
+        "hdbsubnetName": {
             "type": "string",
             "metadata": {
-                "description": "The name of the subnet"
+                "description": "The name of the HDB subnet"
+            },
+            "defaultValue": "azsapdb-subnet"
+        },
+        "storagesubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Storage subnet"
+            },
+            "defaultValue": "azsapdb-subnet"
+        },
+        "clientsubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Client subnet"
             },
             "defaultValue": "azsapdb-subnet"
         },
@@ -154,7 +176,9 @@
         "avSetName": "[if(empty(parameters('availabilitySetName')), concat(variables('sapSystemIdLower'),'-app-avset'),parameters('availabilitySetName'))]",
         "ppgName": "[if(empty(parameters('proximityPlacementGroupName')), concat(variables('sapSystemIdLower'),'-ppg'),parameters('proximityPlacementGroupName'))]",
         "vnetID": "[resourceid(parameters('virtualNetworkResourceGroupName') ,'Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "dbsubnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('hdbsubnetName'))]",
+        "storagesubnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('storagesubnetName'))]",
+        "clientsubnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('clientsubnetName'))]",
         "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
@@ -274,7 +298,7 @@
                         "name": "ipconfig1",
                         "properties": {
                             "subnet": {
-                                "id": "[variables('subnetRef')]"
+                                "id": "[variables('dbsubnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]",
@@ -288,6 +312,60 @@
             "copy": {
                 "count": "[parameters('virtualMachineCount')]",
                 "name": "nicLoop"
+            }
+        },
+        {
+            "name": "[concat(parameters('storageNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-07-01",
+            "location": "[variables('locationName')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('storagesubnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(parameters('storageNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]",
+                            "primary": false,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "enableAcceleratedNetworking": false
+            },
+            "copy": {
+                "count": "[parameters('virtualMachineCount')]",
+                "name": "storagenicLoop"
+            }
+        },
+        {
+            "name": "[concat(parameters('clientNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-07-01",
+            "location": "[variables('locationName')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('clientsubnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(parameters('clientNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]",
+                            "primary": false,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "enableAcceleratedNetworking": false
+            },
+            "copy": {
+                "count": "[parameters('virtualMachineCount')]",
+                "name": "clientnicLoop"
             }
         },
         {
@@ -355,6 +433,12 @@
                     "networkInterfaces": [
                         {
                             "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]"
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('storageNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]"
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('ClientNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]"
                         }
                     ]
                 },
@@ -428,7 +512,7 @@
                                             "privateIPAllocationMethod": "[if(empty(parameters('privateIP')) ,'Dynamic','Static')]",
                                             "privateIPAddress": "[if(empty(parameters('privateIP')) ,'',parameters('privateIP')[copyIndex()])]",
                                             "subnet": {
-                                                "id": "[variables('subnetRef')]"
+                                                "id": "[variables('dbsubnetRef')]"
                                             },
                                             "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]"
                                         }

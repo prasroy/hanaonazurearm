@@ -53,8 +53,14 @@
     "sapSystemId": {
       "value": "HS1"
     },
-    "subnetName": {
-      "value": "azsapdb-subnet"
+    "hdbsubnetName": {
+      "value": "db-subnet"
+    },
+    "storagesubnetName": {
+      "value": "storage-subnet"
+    },
+    "clientsubnetName": {
+      "value": "client-subnet"
     },
     "virtualMachineName": {
       "value": "prhdb"
@@ -66,10 +72,10 @@
       "value": 3
     },
     "virtualNetworkName": {
-      "value": "azprwesapsles-vnet"
+      "value": "hdbscaleout-vnet"
     },
     "virtualNetworkResourceGroupName": {
-      "value": "azprwesapsles-rg"
+      "value": "hdbscaleout-rg"
     },
     "virtualMachineTagValues": {
       "value": { "System": "HANA-Scaleout", "$perfOptimizationLevel": "1" }
