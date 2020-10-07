@@ -1,4 +1,4 @@
-# HANA Scale-Out on Azure with ARM Depoloyment
+# HANA Scale-Out on Azure with Azure NetAPP File (ANF)
 The template currently deploys three HANA Virtual machines with one managed disk attached.
 
 ## **Deployment options and Supported operating systems**
@@ -27,6 +27,6 @@ This is the template for ANF deployment.
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fprasroy%2Fhanaonazurearm%2Fmaster%2Fhdb-scaleout%2Fanfdeploy.json)
 
 #### **infrastructure.json**
-This is the template for the compute abd storage deployment.
+This is the template for the compute and storage deployment.
 
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fprasroy%2Fhanaonazurearm%2Fmaster%2Fhdb-scaleout%2Fhdb-scaleout.json)

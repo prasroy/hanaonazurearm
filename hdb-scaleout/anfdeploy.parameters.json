@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "value": "westeurope"
+      "value": null
     },
     "anfAccountName": {
-      "value": "prsapanfacc"
+      "value": ""
     },
     "anfPoolName": {
       "value": "hdbpool"
@@ -14,19 +14,16 @@
     "poolSizeBytes": {
       "value": 4398046511104
     },
-    "netAppVolumeData": {
-      "value": "[concat(parameters('netAppAccountName'), '/', parameters('netAppPoolName'), '/hn1-data')]"
+    "HANASystemId": {
+      "value": "HS1"
     },
-    "netAppVolumeLog": {
-      "value": "[concat('volume', uniqueString(resourceGroup().id))]"
-    },
-    "netAppVolumeShared": {
-      "value": "[concat('volume', uniqueString(resourceGroup().id))]"
-    },
-    "anfvolDataSizeBites": {
+    "DataVolSizeBytes": {
       "value": 107374182400
     },
-    "anfvolLogSizeBites": {
+    "LogVolSizeBytes": {
+      "value": 107374182400
+    },
+    "SharedVolSizeBytes": {
       "value": 107374182400
     },
     "virtualNetworkName": {
@@ -45,13 +42,13 @@
       "value": "NFSv4.1"
     },
     "unixReadOnly": {
-      "value": null
+      "value": false
     },
     "unixReadWrite": {
       "value": true
     },
     "snapshotDirectoryVisible": {
-      "value": null
+      "value": false
     }
   }
 }
