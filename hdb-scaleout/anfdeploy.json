@@ -15,7 +15,6 @@
       }
     },
     "anfPoolName": {
-      "defaultValue": "[concat('hdbpool', uniqueString(resourceGroup().id))]",
       "type": "String",
       "metadata": {
         "description": "Name for the capacity pool. The capacity pool name must be unique for each NetApp account."
@@ -37,7 +36,7 @@
             "metadata": {
                 "description": "The SAP System ID"
             },
-            "defaultValue": "HS1"
+            "defaultValue": "HN1"
         },
     "DataVolSizeBytes": {
       "type": "int",
@@ -154,6 +153,7 @@
   },
   "resources": [
     {
+      "condition": "[equals(parameters('anfAccountName'),'')]",
       "type": "Microsoft.NetApp/netAppAccounts",
       "apiVersion": "2020-06-01",
       "name": "[variables('anfAccName')]",

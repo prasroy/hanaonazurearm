@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "value": null
+      "value": "westeurope"
     },
     "anfAccountName": {
       "value": ""
     },
     "anfPoolName": {
-      "value": "hdbpool"
+      "value": "pranfhdbpool"
     },
     "poolSizeBytes": {
       "value": 4398046511104
