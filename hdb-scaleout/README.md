@@ -30,6 +30,3 @@ This is the template for ANF deployment.
 This is the template for the compute and storage deployment.
 
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fprasroy%2Fhanaonazurearm%2Fmaster%2Fhdb-scaleout%2Fhdb-scaleout.json)
-
-#### **infrastructure Deployment**
-![Post Deployment](infradeployment.png)
