@@ -329,7 +329,7 @@
                             },
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(parameters('storageNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]",
-                            "primary": false,
+                            "primary": true,
                             "privateIPAddressVersion": "IPv4"
                         }
                     }
@@ -356,7 +356,7 @@
                             },
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(parameters('clientNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]",
-                            "primary": false,
+                            "primary": true,
                             "privateIPAddressVersion": "IPv4"
                         }
                     }
@@ -433,15 +433,21 @@
                     "networkInterfaces": [
                         {
                             "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]",
-                            "primary": true
+                            "properties": {
+                                "primary": true
+                            }
                         },
                         {
                             "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('storageNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]",
-                            "primary": false
+                            "properties":{
+                                "primary": false
+                            }
                         },
                         {
                             "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('ClientNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]",
-                            "primary": false
+                            "properties":{
+                                "primary": false
+                            }
                         }
                     ]
                 },
@@ -485,51 +491,6 @@
                         "value": "[variables('locationName')]"
                     }
                 }
-            }
-        },
-        {
-            "name": "[concat('Update-IP-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2016-09-01",
-            "dependsOn": [
-                "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]"
-            ],
-            "condition": "[not(empty(parameters('privateIP')[0]))]",
-            "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "resources": [
-                        {
-                            "type": "Microsoft.Network/networkInterfaces",
-                            "name": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
-                            "apiVersion": "2019-06-01",
-                            "location": "[parameters('location')]",
-                            "condition": "[parameters('hasPublicIP')]",
-                            "properties": {
-                                "ipConfigurations": [
-                                    {
-                                        "name": "ipconfig1",
-                                        "properties": {
-                                            "privateIPAllocationMethod": "[if(empty(parameters('privateIP')) ,'Dynamic','Static')]",
-                                            "primary": true,
-                                            "privateIPAddress": "[if(empty(parameters('privateIP')) ,'',parameters('privateIP')[copyIndex()])]",
-                                            "subnet": {
-                                                "id": "[variables('dbsubnetRef')]"
-                                            },
-                                            "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]"
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    ]
-                }
-            },
-            "copy": {
-                "name": "updateIPLoop",
-                "count": "[parameters('virtualMachineCount')]"
             }
         }
     ],
