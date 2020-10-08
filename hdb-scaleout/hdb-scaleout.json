@@ -140,13 +140,20 @@
         "virtualMachineSize": {
             "type": "string",
             "allowedValues": [
-                "Standard_E8s_v3",
-                "Standard_E16s_v3",
-                "Standard_E20s_v3",
-                "Standard_E32s_v3",
-                "Standard_E8ds_v4",
-                "Standard_E16ds_v4",
-                "Standard_E20ds_v4"
+                "Standard_E20ds_v4",
+                "Standard_E32ds_v4",
+                "Standard_E48ds_v4",
+                "Standard_E64ds_v4",
+                "Standard_E64s_v3",
+                "Standard_M32ts",
+                "Standard_M32ls",
+                "Standard_M64ls",
+                "Standard_M64ms",
+                "Standard_M64s",
+                "Standard_M128s",
+                "Standard_M128ms",
+                "Standard_M208s_v2",
+                "Standard_M208ms_v2"
             ],
             "defaultValue": "Standard_E8s_v3"
         },
