@@ -42,7 +42,7 @@
         },
         "sku": {
             "type": "string",
-            "defaultValue": "12-sp4"
+            "defaultValue": "12-sp5"
         },
         "version": {
             "type": "string",
