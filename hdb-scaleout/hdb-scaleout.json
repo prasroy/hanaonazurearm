@@ -99,13 +99,12 @@
         },
         "environmentType": {
             "type": "string",
-            "defaultValue": "PRD",
+            "defaultValue": "SBX",
             "allowedValues": [
-                "DEV",
-                "QA",
-                "PRD",
                 "SBX",
-                "TST"
+                "DEV",
+                "QAS",
+                "PRD"
             ]
         },
         "hdbsubnetName": {
@@ -206,10 +205,22 @@
         "allVMTags": "[union(parameters('virtualMachineTagValues'),variables('sidTag'),variables('envTag'))]",
         "github": "https://raw.githubusercontent.com/prasroy/hanaonazurearm/master/hdb-scaleout",
         "diskSizes": {
-            "HDB": {
+            "SBX": {
                 "osdiskSizeGB": 64,
                 "nrDisks": 1
-            }
+            },
+            "DEV": {
+                "osdiskSizeGB": 64,
+                "nrDisks": 1
+            },
+            "QAS": {
+                "osdiskSizeGB": 64,
+                "nrDisks": 1
+            },
+            "PRD": {
+                "osdiskSizeGB": 64,
+                "nrDisks": 1
+            },
         },
         "nrOfDisks": "[variables('diskSizes')['HDB'].nrDisks]"
     },
@@ -492,11 +503,36 @@
                         "value": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]"
                     },
                     "machineSize": {
-                        "value": "HDB"
+                        "value": "[parameters('environmentType')]"
                     },
                     "location": {
                         "value": "[variables('locationName')]"
                     }
+                }
+            }
+        },
+        {
+            "name": "[concat('customScript-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2019-03-01",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('sapMachineName'), '-',padLeft(copyIndex(1),2,'0'))]"
+            ],
+            "copy": {
+                "name": "customScriptLoop",
+                "count": "[parameters('virtualMachineCount')]"
+            },
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "[concat(variables('github'),'scripts/filesystems.sh')]"
+                    ],
+                "commandToExecute": "[concat(' && chmod +x && /tmp/filesystems.sh sh /tmp/filesystems.sh \"', toUpper(parameters('sapSystemId')), parameters('environmentType'))]"
                 }
             }
         }

@@ -18,7 +18,7 @@
     },
     "variables": {
         "diskSizes": {
-            "HDB": {
+            "SBX": {
                 "disks": [
                     {
                         "lun": 0,
@@ -29,6 +29,66 @@
                         "name": "-usr_sap",
                         "storageAccountType": null,
                         "sku": "StandardSSD_LRS",
+                        "properties": {
+                            "diskSizeGB": 64,
+                            "creationData": {
+                                "createOption": "empty"
+                            }
+                        }
+                    }
+                ]
+            },
+            "DEV": {
+                "disks": [
+                    {
+                        "lun": 0,
+                        "createOption": "attach",
+                        "caching": "ReadWrite",
+                        "writeAcceleratorEnabled": false,
+                        "id": null,
+                        "name": "-usr_sap",
+                        "storageAccountType": null,
+                        "sku": "StandardSSD_LRS",
+                        "properties": {
+                            "diskSizeGB": 64,
+                            "creationData": {
+                                "createOption": "empty"
+                            }
+                        }
+                    }
+                ]
+            },
+            "QAS": {
+                "disks": [
+                    {
+                        "lun": 0,
+                        "createOption": "attach",
+                        "caching": "ReadWrite",
+                        "writeAcceleratorEnabled": false,
+                        "id": null,
+                        "name": "-usr_sap",
+                        "storageAccountType": null,
+                        "sku": "Premium_LRS",
+                        "properties": {
+                            "diskSizeGB": 64,
+                            "creationData": {
+                                "createOption": "empty"
+                            }
+                        }
+                    }
+                ]
+            },
+            "PRD": {
+                "disks": [
+                    {
+                        "lun": 0,
+                        "createOption": "attach",
+                        "caching": "ReadWrite",
+                        "writeAcceleratorEnabled": false,
+                        "id": null,
+                        "name": "-usr_sap",
+                        "storageAccountType": null,
+                        "sku": "Premium_LRS",
                         "properties": {
                             "diskSizeGB": 64,
                             "creationData": {
