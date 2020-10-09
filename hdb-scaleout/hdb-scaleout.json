@@ -99,7 +99,7 @@
         },
         "environmentType": {
             "type": "string",
-            "defaultValue": "SBX",
+            "defaultValue": "DEV",
             "allowedValues": [
                 "SBX",
                 "DEV",
