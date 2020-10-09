@@ -220,7 +220,7 @@
             "PRD": {
                 "osdiskSizeGB": 64,
                 "nrDisks": 1
-            },
+            }
         },
         "nrOfDisks": "[variables('diskSizes')['HDB'].nrDisks]"
     },
