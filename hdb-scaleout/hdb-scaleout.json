@@ -222,7 +222,7 @@
                 "nrDisks": 1
             }
         },
-        "nrOfDisks": "[variables('diskSizes')['HDB'].nrDisks]"
+        "nrOfDisks": "[variables('diskSizes')[parameters('environmentType')].nrDisks]"
     },
     "resources": [
         {
@@ -508,31 +508,6 @@
                     "location": {
                         "value": "[variables('locationName')]"
                     }
-                }
-            }
-        },
-        {
-            "name": "[concat('customScript-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "location": "[resourceGroup().location]",
-            "apiVersion": "2019-03-01",
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('sapMachineName'), '-',padLeft(copyIndex(1),2,'0'))]"
-            ],
-            "copy": {
-                "name": "customScriptLoop",
-                "count": "[parameters('virtualMachineCount')]"
-            },
-            "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": [
-                        "[concat(variables('github'),'scripts/filesystems.sh')]"
-                    ],
-                "commandToExecute": "[concat(' && chmod +x && /tmp/filesystems.sh sh /tmp/filesystems.sh \"', toUpper(parameters('sapSystemId')), parameters('environmentType'))]"
                 }
             }
         }
