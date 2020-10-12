@@ -10,6 +10,7 @@ zypper install -y systemd-228-142.1
 zypper install -y unrar
 zypper install -y sapconf
 zypper install -y saptune
+zypper install -y libatomic1
 mkdir /etc/systemd/login.conf.d
 mkdir /hana
 mkdir /hana/data
