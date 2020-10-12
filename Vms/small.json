@@ -19,11 +19,11 @@
             "metadata": {
                 "description": "Select the Operating system for your HANA VM"
             },
-            "defaultValue": "SLES for SAP 12 SP3",
+            "defaultValue": "SLES for SAP 12 SP5",
             "allowedValues": [
-                "SLES for SAP 12 SP4",
-                "SLES for SAP 12 SP3",
-                "RHEL 7.3 for SAP HANA",
+                "SLES for SAP 12 SP5",
+                "SLES for SAP 15 SP1",
+                "RHEL 7.7 for SAP HANA",
             ]
         },
         "vmUserName": {
@@ -82,7 +82,7 @@
             "metadata": {
                 "description": "IP Address for the HANA VM when Static IP Allocation Method has been selected"
             },
-            "defaultValue": "10.0.5.4"
+            "defaultValue": "10.100.0.5"
         },
         "publicIPAddressType": {
             "type": "string",
@@ -120,7 +120,7 @@
         "OperatingSystemSpec": {
             "imagePublisher": "[if (contains(parameters('OperatingSystem'),'SLES'),'SUSE','RedHat')]",
             "imageOffer": "[if (contains(parameters('OperatingSystem'),'SLES'),'SLES-SAP','RHEL-SAP-HANA')]",
-            "sku": "[if (contains(parameters('OperatingSystem'),'12 SP4'),'12-SP4',if (contains(parameters('OperatingSystem'),'12 SP3'),'12-SP3','7.3'))]"
+            "sku": "[if (contains(parameters('OperatingSystem'),'15 SP1'),'15-SP1',if (contains(parameters('OperatingSystem'),'12 SP5'),'12-SP5','7.7'))]"
         },
         "diskConfig": "[variables(concat('diskConfig_', parameters('vmSize')))]",
         "diskConfig_Standard_E8s_v3": {
