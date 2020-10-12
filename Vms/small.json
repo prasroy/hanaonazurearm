@@ -19,7 +19,7 @@
             "metadata": {
                 "description": "Select the Operating system for your HANA VM"
             },
-            "defaultValue": "SLES for SAP 12 SP5",
+            "defaultValue": "SLES for SAP 15 SP1",
             "allowedValues": [
                 "SLES for SAP 12 SP5",
                 "SLES for SAP 15 SP1",
