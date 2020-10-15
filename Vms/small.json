@@ -38,7 +38,7 @@
             "metadata": {
                 "description": "Password for the Virtual Machine"
             },
-            "defaultValue": "Hana07061992!"
+            "defaultValue": "********"
         },
         "departmentName": {
             "type": "string",
