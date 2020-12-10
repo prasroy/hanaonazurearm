@@ -8,6 +8,10 @@
         "adminPasswordOrKey": {
             "type": "securestring"
         },
+        "applicationSecurityGroupName": {
+            "type": "string",
+            "defaultValue": "sap-app-asg"
+        },
         "authenticationType": {
             "type": "string",
             "defaultValue": "password",
@@ -20,45 +24,26 @@
             }
         },
         "availabilitySetName": {
-            "type": "string",
-            "defaultValue": "hdb-scaleout"
+            "type": "string"
+        },
+        "imageID": {
+            "type": "string"
         },
         "publisher": {
-            "type": "string",
-            "allowedValues": [
-                "SUSE",
-                "RedHat"
-            ],
-            "metadata": {
-                "description": "Provide the publisher of the OS Image"
-            }   
+            "type": "string"
         },
         "offer": {
-            "type": "string",
-            "defaultValue": "SLES-SAP-BYOS",
-             "metadata": {
-                "description": "Provide the Offer of the OS Image"
-            } 
+            "type": "string"
         },
         "sku": {
-            "type": "string",
-            "defaultValue": "12-sp5"
+            "type": "string"
         },
         "version": {
-            "type": "string",
-            "defaultValue": "latest"
+            "type": "string"
         },
         "hasPublicIP": {
             "type": "bool",
             "defaultValue": false
-        },
-        "storageNICprefix": {
-            "type": "string",
-            "defaultValue": "[concat(toLower(parameters('sapSystemId')), '-storage')]"
-        },
-        "ClientNICprefix": {
-            "type": "string",
-            "defaultValue": "[concat(toLower(parameters('sapSystemId')), '-client')]"
         },
         "domainNameLabel": {
             "type": "bool"
@@ -70,9 +55,14 @@
             },
             "defaultValue": "[resourceGroup().location]"
         },
+        "privateIP": {
+            "type": "array",
+            "defaultValue": [
+                ""
+            ]
+        },
         "proximityPlacementGroupName": {
-            "type": "string",
-            "defaultValue": "hdb-ppg"
+            "type": "string"
         },
         "sapSystemId": {
             "type": "string",
@@ -80,111 +70,91 @@
             "maxLength": 3,
             "metadata": {
                 "description": "The SAP System ID"
-            },
-            "defaultValue": "HN1"
+            }
         },
-        "existsdiagnosticsStorageAccount": {
-            "type": "string",
-            "metadata": {
-                "description": "Do you have existing diagnostics storage account otherwise left empty"
-            },
-            "defaultValue": ""
-        },
-        "diagstorageNamePrefix": {
+        "diagnosticsStorageAccount": {
             "type": "string",
             "metadata": {
                 "description": "The name of the diagnostics storage account"
-            },
-            "defaultValue": "hdbdiag"
+            }
         },
         "environmentType": {
             "type": "string",
-            "defaultValue": "DEV",
+            "defaultValue": "PRD",
             "allowedValues": [
-                "SBX",
                 "DEV",
-                "QAS",
-                "PRD"
+                "QA",
+                "PRD",
+                "SBX",
+                "TST"
             ]
         },
-        "hdbsubnetName": {
+        "subnetName": {
             "type": "string",
             "metadata": {
-                "description": "The name of the HDB subnet"
+                "description": "The name of the subnet"
             },
-            "defaultValue": "azsapdb-subnet"
-        },
-        "storagesubnetName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the Storage subnet"
-            },
-            "defaultValue": "azsapdb-subnet"
-        },
-        "clientsubnetName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the Client subnet"
-            },
-            "defaultValue": "azsapdb-subnet"
+            "defaultValue": "app-snet"
         },
         "virtualMachineCount": {
             "type": "int",
-            "defaultValue": 3
+            "defaultValue": 1
         },
         "virtualMachineName": {
             "type": "string",
-            "defaultValue": "prhdb"
+            "defaultValue": "app"
         },
         "virtualMachineSize": {
             "type": "string",
             "allowedValues": [
-                "Standard_E20ds_v4",
-                "Standard_E32ds_v4",
-                "Standard_E48ds_v4",
-                "Standard_E64ds_v4",
+                "Standard_D2s_v3",
+                "Standard_D4s_v3",
+                "Standard_D8s_v3",
+                "Standard_D16s_v3",
+                "Standard_D32s_v3",
+                "Standard_D48s_v3",
+                "Standard_D64s_v3",
+                "Standard_E2s_v3",
+                "Standard_E4s_v3",
+                "Standard_E8s_v3",
+                "Standard_E16s_v3",
+                "Standard_E20s_v3",
+                "Standard_E32s_v3",
+                "Standard_E48s_v3",
                 "Standard_E64s_v3",
-                "Standard_M32ts",
-                "Standard_M32ls",
-                "Standard_M64ls",
-                "Standard_M64ms",
-                "Standard_M64s",
-                "Standard_M128s",
-                "Standard_M128ms",
-                "Standard_M208s_v2",
-                "Standard_M208ms_v2"
+                "Standard_E64is_v3"
             ],
-            "defaultValue": "Standard_E20ds_v4"
-        },
-        "privateIP": {
-            "type": "array"
+            "defaultValue": "Standard_D2s_v3"
         },
         "virtualMachineTagValues": {
-            "type": "object"
+            "type": "object",
+            "defaultValue": null
         },
         "virtualNetworkName": {
             "type": "string",
             "metadata": {
                 "description": "The name of the vnet"
             },
-            "defaultValue": "azprwesapsles-vnet"
+            "defaultValue": "demo-vnet"
         },
         "virtualNetworkResourceGroupName": {
-            "type": "string",
-            "defaultValue": "azprwesapsles-rg"
+            "type": "string"
+        },
+        "zone": {
+            "type": "array",
+            "defaultValue": [
+                ""
+            ]
         }
     },
     "variables": {
         "sapSystemIdLower": "[toLower(parameters('sapSystemId'))]",
-        "diagstorageName": "[if(empty(parameters('existsdiagnosticsStorageAccount')),toLower( concat( parameters('diagstorageNamePrefix'), uniqueString(resourceGroup().id) ) ),parameters('diagstorageNamePrefix'))]",
         "locationName": "[if(empty(parameters('location')) , resourceGroup().location,parameters('location'))]",
         "sapMachineName": "[concat(variables('sapSystemIdLower'),'-',parameters('virtualMachineName'))]",
         "avSetName": "[if(empty(parameters('availabilitySetName')), concat(variables('sapSystemIdLower'),'-app-avset'),parameters('availabilitySetName'))]",
         "ppgName": "[if(empty(parameters('proximityPlacementGroupName')), concat(variables('sapSystemIdLower'),'-ppg'),parameters('proximityPlacementGroupName'))]",
         "vnetID": "[resourceid(parameters('virtualNetworkResourceGroupName') ,'Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-        "dbsubnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('hdbsubnetName'))]",
-        "storagesubnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('storagesubnetName'))]",
-        "clientsubnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('clientsubnetName'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
         "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
@@ -203,85 +173,81 @@
             "Environment": "[parameters('environmentType')]"
         },
         "allVMTags": "[union(parameters('virtualMachineTagValues'),variables('sidTag'),variables('envTag'))]",
-        "github": "https://raw.githubusercontent.com/prasroy/hanaonazurearm/master/hdb-scaleout",
+
         "diskSizes": {
-            "SBX": {
-                "osdiskSizeGB": 64,
-                "nrDisks": 1
-            },
-            "DEV": {
-                "osdiskSizeGB": 64,
-                "nrDisks": 1
-            },
-            "QAS": {
-                "osdiskSizeGB": 64,
-                "nrDisks": 1
-            },
-            "PRD": {
-                "osdiskSizeGB": 64,
+            "ASCS": {
+                "osdiskSizeGB": 63,
                 "nrDisks": 1
             }
         },
-        "nrOfDisks": "[variables('diskSizes')[parameters('environmentType')].nrDisks]"
+        "nrOfDisks": "[variables('diskSizes')['ASCS'].nrDisks]",
+        "applicationSecurityGroupID": "[resourceId(parameters('virtualNetworkResourceGroupName'),'Microsoft.Network/applicationSecurityGroups',parameters('applicationSecurityGroupName'))]",
+        "github": "https://raw.githubusercontent.com/Azure/SAP-on-Azure-Scripts-and-Utilities/master/ARMTemplates/serverTemplates/",
+        "customImage": "[if(greater(length(trim(parameters('imageID'))),2),parameters('imageID'),'')]"
+
     },
     "resources": [
         {
             "apiVersion": "2018-04-01",
             "type": "Microsoft.Compute/proximityPlacementGroups",
+            "name": "[concat(variables('ppgName'),'-', padLeft(add(mod(copyIndex(0),2),1),2,'0'))]",
+            "location": "[variables('locationName')]",
+            "condition": "[greater(length(parameters('Zone')),1)]",
+            "copy": {
+                "count": "[if(greater(length(parameters('Zone')),1),2,1)]",
+                "name": "ppgLoop"
+            }
+
+        },
+        {
+            "apiVersion": "2018-04-01",
+            "type": "Microsoft.Compute/proximityPlacementGroups",
             "name": "[variables('ppgName')]",
-            "location": "[variables('locationName')]"
+            "location": "[variables('locationName')]",
+            "condition": "[or(empty(parameters('Zone')),equals(length(parameters('Zone')),1))]"
         },
         {
             "type": "Microsoft.Compute/availabilitySets",
             "name": "[variables('avSetName')]",
             "apiVersion": "2018-10-01",
             "location": "[variables('locationName')]",
+            "condition": "[or(empty(parameters('Zone')),equals(length(parameters('Zone')),1))]",
             "sku": {
                 "name": "Aligned"
             },
             "properties": {
-                "platformFaultDomainCount": 3,
+                "platformFaultDomainCount": 2,
                 "platformUpdateDomainCount": 10,
                 "proximityPlacementGroup": {
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppgName'))]"
                 }
             },
             "dependsOn": [
-                "[concat('Microsoft.Compute/proximityPlacementGroups/', concat(variables('ppgName')))]"
+                "[concat('Microsoft.Compute/proximityPlacementGroups/', variables('ppgName'))]"
             ]
         },
         {
-            "condition": "[equals(parameters('existsdiagnosticsStorageAccount'),'')]",
-            "type": "Microsoft.Storage/storageAccounts",
-            "name": "[variables('diagstorageName')]",
-            "apiVersion": "2019-06-01",
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[concat(variables('avSetName'),'-', padLeft(add(mod(copyIndex(0),2),1),2,'0'))]",
+            "apiVersion": "2018-10-01",
             "location": "[variables('locationName')]",
+            "condition": "[greater(length(parameters('Zone')),1)]",
             "sku": {
-                "name": "Standard_LRS",
-                "tier": "Standard"
+                "name": "Aligned"
             },
-            "kind": "Storage",
             "properties": {
-                "networkAcls": {
-                    "bypass": "AzureServices",
-                    "virtualNetworkRules": [],
-                    "ipRules": [],
-                    "defaultAction": "Allow"
-                },
-                "supportsHttpsTrafficOnly": true,
-                "encryption": {
-                    "services": {
-                        "file": {
-                            "keyType": "Account",
-                            "enabled": true
-                        },
-                        "blob": {
-                            "keyType": "Account",
-                            "enabled": true
-                        }
-                    },
-                    "keySource": "Microsoft.Storage"
+                "platformFaultDomainCount": 2,
+                "platformUpdateDomainCount": 10,
+                "proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',concat(variables('ppgName'),'-', padLeft(add(mod(copyIndex(0),2),1),2,'0')))]"
                 }
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/proximityPlacementGroups/', concat(variables('ppgName'),'-', padLeft(add(mod(copyIndex(0),2),1),2,'0')))]"
+            ],
+            "copy": {
+                "count": "[if(greater(length(parameters('Zone')),1),2,1)]",
+                "name": "ppgLoop"
             }
         },
         {
@@ -289,6 +255,7 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2019-02-01",
             "location": "[variables('locationName')]",
+            "zones": "[if(empty(parameters('Zone')), '', json(concat('[',if(greater(length(parameters('Zone')),1),'',parameters('Zone')[0]),']')) )]",
             "condition": "[parameters('hasPublicIP')]",
             "properties": {
                 "publicIpAllocationMethod": "Static",
@@ -316,12 +283,13 @@
                         "name": "ipconfig1",
                         "properties": {
                             "subnet": {
-                                "id": "[variables('dbsubnetRef')]"
+                                "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]",
                             "primary": true,
-                            "privateIPAddressVersion": "IPv4"
+                            "privateIPAddressVersion": "IPv4",
+                            "applicationSecurityGroups": "[if(not(empty(variables('applicationSecurityGroupID'))),json(concat('[{ \"id\" : \"',variables('applicationSecurityGroupID'),'\"}]')), json('null'))]"
                         }
                     }
                 ],
@@ -333,76 +301,18 @@
             }
         },
         {
-            "name": "[concat(parameters('storageNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2019-07-01",
-            "location": "[variables('locationName')]",
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "subnet": {
-                                "id": "[variables('storagesubnetRef')]"
-                            },
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(parameters('storageNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]",
-                            "primary": true,
-                            "privateIPAddressVersion": "IPv4"
-                        }
-                    }
-                ],
-                "enableAcceleratedNetworking": true
-            },
-            "copy": {
-                "count": "[parameters('virtualMachineCount')]",
-                "name": "storagenicLoop"
-            }
-        },
-        {
-            "name": "[concat(parameters('clientNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2019-07-01",
-            "location": "[variables('locationName')]",
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "subnet": {
-                                "id": "[variables('clientsubnetRef')]"
-                            },
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(parameters('clientNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]",
-                            "primary": true,
-                            "privateIPAddressVersion": "IPv4"
-                        }
-                    }
-                ],
-                "enableAcceleratedNetworking": true
-            },
-            "copy": {
-                "count": "[parameters('virtualMachineCount')]",
-                "name": "clientnicLoop"
-            }
-        },
-        {
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
             "dependsOn": [
                 "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
-                "[concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('diagstorageName'))]"
+                "[concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]"
             ],
             "apiVersion": "2018-10-01",
             "location": "[variables('locationName')]",
+            "zones": "[if(empty(parameters('Zone')), '', json(concat('[',if(greater(length(parameters('Zone')),1),'',parameters('Zone')[0]),']')) )]",
             "properties": {
-                "availabilitySet":{
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('avSetName'))]"
-                }, 
-                "proximityPlacementGroup":{
-                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppgName'))]"
-                },
+                "availabilitySet": "[if(empty(parameters('Zone')),json(concat('{ \"id\" : \"',resourceId('Microsoft.Compute/availabilitySets',concat(variables('avSetName'))),'\"}')),if(equals(length(parameters('Zone')),1),json('null'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Compute/availabilitySets',concat(variables('avSetName'),'-',padLeft(copyIndex(1),2,'0'))),'\"}'))))]",
+                "proximityPlacementGroup": "[if(not(empty(parameters('Zone'))),if(and(greater(parameters('virtualMachineCount'),1),greater(length(parameters('Zone')),1)),json(concat('{ \"id\" : \"',resourceId('Microsoft.Compute/proximityPlacementGroups',concat(variables('ppgName'),'-',padLeft( copyIndex(1),2,'0'))),'\"}')), json(concat('{ \"id\" : \"',resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppgName')),'\"}'))), json(concat('{ \"id\" : \"',resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppgName')),'\"}')))]",
                 "hardwareProfile": {
                     "vmSize": "[parameters('virtualMachineSize')]"
                 },
@@ -414,16 +324,17 @@
                 },
                 "storageProfile": {
                     "imageReference": {
-                        "publisher": "[ parameters('publisher')]",
-                        "offer": "[parameters('offer')]",
-                        "sku": "[parameters('sku')]",
-                        "version": "[parameters('version')]"
+                        "publisher": "[if(empty(variables('customImage')), parameters('publisher'),json('null'))]",
+                        "offer": "[if(empty(variables('customImage')), parameters('offer'),json('null'))]",
+                        "sku": "[if(empty(variables('customImage')), parameters('sku'),json('null'))]",
+                        "version": "[if(empty(variables('customImage')), parameters('version'),json('null'))]",
+                        "id": "[if(not(empty(variables('customImage'))), parameters('imageID'),json('null'))]"
                     },
                     "osDisk": {
                         "name": "[concat(variables('sapMachineName'),'-', padLeft(copyIndex(1),2,'0'), '-osdisk')]",
                         "caching": "ReadWrite",
                         "createOption": "FromImage",
-                        "diskSizeGB": "[if(startsWith(toLower(parameters('publisher')),'microsoft') ,127, 32)]",
+                        "diskSizeGB": "[if(startsWith(toLower(parameters('publisher')),'microsoft') ,127, 63)]",
                         "managedDisk": {
                             "storageAccountType": "Premium_LRS"
 
@@ -450,29 +361,14 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]",
-                            "properties": {
-                                "primary": true
-                            }
-                        },
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('storageNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]",
-                            "properties":{
-                                "primary": false
-                            }
-                        },
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('ClientNICprefix'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]",
-                            "properties":{
-                                "primary": false
-                            }
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]"
                         }
                     ]
                 },
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[concat('https://',variables('diagstorageName'),'.blob.core.windows.net/')]"
+                        "storageUri": "[concat('https://',parameters('diagnosticsStorageAccount'),'.blob.core.windows.net/')]"
                     }
                 }
             },
@@ -494,7 +390,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('github'),'/VMDisks.json')]",
+                    "uri": "[concat(variables('github'),'/disks/AppVMDisks.json')]",
                     "contentVersion": "1.0.0.0"
                 },
 
@@ -503,37 +399,60 @@
                         "value": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]"
                     },
                     "machineSize": {
-                        "value": "[parameters('environmentType')]"
+                        "value": "APP"
                     },
                     "location": {
                         "value": "[variables('locationName')]"
+                    },
+                    "zone": {
+                        "value": "[if(empty(parameters('Zone')), '', if(greater(length(parameters('Zone')),1),'',parameters('Zone')[0]))]"
                     }
                 }
             }
         },
         {
-            "name": "[concat('customScript-',variables('sapMachineName'))]",
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "location": "[resourceGroup().location]",
-            "apiVersion": "2019-03-01",
+            "name": "[concat('Update-IP-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2016-09-01",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('sapMachineName'), '-',padLeft(copyIndex(1),2,'0'))]"
+                "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]"
             ],
-            "copy": {
-                "name": "customScriptLoop",
-                "count": "[parameters('virtualMachineCount')]"
-            },
+            "condition": "[not(empty(parameters('privateIP')[0]))]",
             "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": [
-                        "[concat(variables('github'),'scripts/filesystems.sh')]"
-                    ],
-                "commandToExecute": " sh filesystems.sh"
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/networkInterfaces",
+                            "name": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
+                            "apiVersion": "2019-06-01",
+                            "location": "[parameters('location')]",
+                            "condition": "[parameters('hasPublicIP')]",
+                            "properties": {
+                                "ipConfigurations": [
+                                    {
+                                        "name": "ipconfig1",
+                                        "properties": {
+                                            "privateIPAllocationMethod": "[if(empty(parameters('privateIP')) ,'Dynamic','Static')]",
+                                            "privateIPAddress": "[if(empty(parameters('privateIP')) ,'',parameters('privateIP')[copyIndex()])]",
+                                            "subnet": {
+                                                "id": "[variables('subnetRef')]"
+                                            },
+                                            "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]",
+                                            "applicationSecurityGroups": "[if(not(empty(variables('applicationSecurityGroupID'))),json(concat('[{ \"id\" : \"',variables('applicationSecurityGroupID'),'\"}]')), json('null'))]"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
                 }
+            },
+            "copy": {
+                "name": "updateIPLoop",
+                "count": "[parameters('virtualMachineCount')]"
             }
         }
     ],

@@ -1,0 +1,93 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "value": "[ADMINUSER]"
+    },
+    "authenticationType": {
+      "value": "password"
+    },
+    "adminPasswordOrKey": {
+      "reference": {
+        "keyVault": {
+          "id": "[KeyVaultID]"
+        },
+        "secretName": "[PASSWORDSECRET]"
+      }
+    },
+    "applicationSecurityGroupName": {
+      "value": "[DBASG]"
+    },
+    "availabilitySetName": {
+      "value": "[SID]-db-avset"
+    },
+    "diagnosticsStorageAccount": {
+      "value": "[DIAGNOSTICSACCOUNT]"
+    },
+    "environmentType":{
+      "value": "[ENVTYPE]"
+    },
+    "hasPublicIP": {
+      "value": "[HASPUBLICIP]"
+    },
+    "domainNameLabel":
+    {
+      "value": "[DNS]"
+    },
+    "imageID": {
+      "value": "[IMAGEID]"
+    },
+    "location": {
+      "value": "[LOCATION]"
+    },
+    "privateIP": {
+      "value": [""]
+    },
+    "proximityPlacementGroupName": {
+      "value": "[SID]-ppg"
+    },
+    "publisher": {
+      "value": "[PUBLISHER]"
+    },
+    "offer": {
+      "value": "[OFFER]"
+    },
+    "sku": {
+      "value": "[SKU]"
+    },
+    "version": {
+      "value": "[VERSION]"
+    },
+    "sapSystemId": {
+      "value": "[SID]"
+    },
+    "mountDisks" :{
+      "value": "[MOUNTDISKS]"
+    },
+    "virtualMachineCount": {
+      "value": "[VMCount]"
+    },
+    "virtualMachineName": {
+      "value": "[SERVERNAME]"
+    },
+    "virtualMachineSize": {
+      "value": "[MACHINESIZE]"
+    },
+    "virtualNetworkResourceGroupName": {
+      "value": "[VNetRG]"
+    },
+    "virtualNetworkName": {
+      "value": "[VNetName]"
+    },
+    "subnetName": {
+      "value": "[DBSubnetName]"
+    },
+    "virtualMachineTagValues": {
+      "value": { "System": "SAP", "$perfOptimizationLevel": "1" }
+    },
+    "zone": {
+      "value": []
+    }
+  }
+}
