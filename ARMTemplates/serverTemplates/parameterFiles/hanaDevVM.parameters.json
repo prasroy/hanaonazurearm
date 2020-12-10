@@ -1,0 +1,89 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "authenticationType": {
+      "value": "password"
+    },
+    "adminPasswordOrKey": {
+      
+      "value": "Hana07061992!"
+    },
+    "applicationSecurityGroupName": {
+      "value": "sap-db-asg"
+    },
+    "availabilitySetName": {
+      "value": "RP1-db-avset"
+    },
+    "diagnosticsStorageAccount": {
+      "value": "azprwesapslesrgdiag"
+    },
+    "environmentType":{
+      "value": "DEV"
+    },
+    "hasPublicIP": {
+      "value": false
+    },
+    "domainNameLabel":
+    {
+      "value": true
+    },
+    "imageID": {
+      "value": ""
+    },
+    "location": {
+      "value": "westeurope"
+    },
+    "privateIP": {
+      "value": [""]
+    },
+    "proximityPlacementGroupName": {
+      "value": "RP1-ppg"
+    },
+    "publisher": {
+      "value": "SUSE"
+    },
+    "offer": {
+      "value": "sles-sap-15-sp1-byos"
+    },
+    "sku": {
+      "value": "gen1"
+    },
+    "version": {
+      "value": "latest"
+    },
+    "sapSystemId": {
+      "value": "RP1"
+    },
+    "mountDisks" :{
+      "value": true
+    },
+    "virtualMachineCount": {
+      "value": 2
+    },
+    "virtualMachineName": {
+      "value": "avprhdbnode1"
+    },
+    "virtualMachineSize": {
+      "value": "Standard_E20ds_v4"
+    },
+    "virtualNetworkResourceGroupName": {
+      "value": "azprwesapsles-rg"
+    },
+    "virtualNetworkName": {
+      "value": "azprwesapsles-vnet"
+    },
+    "subnetName": {
+      "value": "azsapdb-subnet"
+    },
+    "virtualMachineTagValues": {
+      "value": { "System": "SAP", "$perfOptimizationLevel": "1" }
+    },
+    "zone": {
+      "value": []
+    }
+  }
+}
