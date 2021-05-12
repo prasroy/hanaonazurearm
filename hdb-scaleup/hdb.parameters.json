@@ -1,0 +1,78 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "adminPasswordOrKey": {
+      "value": ""
+    },
+    "authenticationType": {
+      "value": "sshPublicKey"
+    },
+    "availabilitySetName": {
+      "value": "hs1-hdb-avset"
+    },
+    "existsdiagnosticsStorageAccount": {
+      "value": ""
+    },
+    "diagstorageNamePrefix": {
+      "value": "prhdb"
+    },
+    "hasPublicIP": {
+      "value": false
+    },
+    "privateIP": {
+      "value": [""]
+    },
+    "domainNameLabel":{
+      "value": false
+    },
+    "environmentType": {
+      "value": "DEV"
+    },
+    "publisher": {
+      "value": "SUSE"
+    },
+    "offer": {
+      "value": "sles-sap-15-sp2-byos"
+    },
+    "sku": {
+      "value": "gen1"
+    },
+    "version": {
+      "value": "latest"
+    },
+    "location": {
+      "value": "westeurope"
+    },
+    "proximityPlacementGroupName": {
+      "value": "sapewm-ppg"
+    },
+    "sapSystemId": {
+      "value": "HS1"
+    },
+    "hdbsubnetName": {
+      "value": "db-subnet"
+    },
+    "virtualMachineName": {
+      "value": "prhdb"
+    },
+    "virtualMachineSize": {
+      "value": "Standard_E20ds_v4"
+    },
+    "virtualMachineCount": {
+      "value": 1
+    },
+    "virtualNetworkName": {
+      "value": "hdbscaleout-vnet"
+    },
+    "virtualNetworkResourceGroupName": {
+      "value": "hdbscaleout-rg"
+    },
+    "virtualMachineTagValues": {
+      "value": { "System": "HANA-Scaleout", "$perfOptimizationLevel": "1" }
+    }
+  }
+}
