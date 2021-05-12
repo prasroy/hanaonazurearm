@@ -452,7 +452,7 @@
                     "fileUris": [
                         "[concat(variables('github'),'scripts/osconfig.sh')]"
                     ],
-                "commandToExecute": " sh filesystems.sh"
+                "commandToExecute": " sh osconfig.sh"
                 }
             }
         }
