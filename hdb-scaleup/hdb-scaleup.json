@@ -131,11 +131,12 @@
         },
         "virtualMachineName": {
             "type": "string",
-            "defaultValue": "prlabhdb01"
+            "defaultValue": "prlabhdb"
         },
         "virtualMachineSize": {
             "type": "string",
             "allowedValues": [
+                "Standard_E8ds_v4",
                 "Standard_E20ds_v4",
                 "Standard_E32ds_v4",
                 "Standard_E48ds_v4",
