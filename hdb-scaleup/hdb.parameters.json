@@ -33,13 +33,13 @@
       "value": "DEV"
     },
     "publisher": {
-      "value": "SUSE"
+      "value": "suse"
     },
     "offer": {
-      "value": "sles-sap-15-sp2-byos"
+      "value": "sles-sap-15-sp1"
     },
     "sku": {
-      "value": "gen1"
+      "value": "gen2"
     },
     "version": {
       "value": "latest"
@@ -54,22 +54,22 @@
       "value": "HS1"
     },
     "hdbsubnetName": {
-      "value": "db-subnet"
+      "value": "azsapdb-subnet"
     },
     "virtualMachineName": {
-      "value": "prhdb"
+      "value": "prlabhdb"
     },
     "virtualMachineSize": {
-      "value": "Standard_E20ds_v4"
+      "value": "Standard_E8ds_v4"
     },
     "virtualMachineCount": {
       "value": 1
     },
     "virtualNetworkName": {
-      "value": "hdbscaleout-vnet"
+      "value": "azprwesapsles-vnet"
     },
     "virtualNetworkResourceGroupName": {
-      "value": "hdbscaleout-rg"
+      "value": "azprwesapsles-rg"
     },
     "virtualMachineTagValues": {
       "value": { "System": "HANA-Scaleout", "$perfOptimizationLevel": "1" }
