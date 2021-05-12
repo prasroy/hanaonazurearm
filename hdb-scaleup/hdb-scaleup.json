@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "adminUsername": {
@@ -432,7 +432,7 @@
             }
         },
         {
-            "name": "[concat('customScript-',variables('sapMachineName'))]",
+            "name": "[concat('customScript',variables('sapMachineName'))]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "location": "[resourceGroup().location]",
             "apiVersion": "2019-03-01",
@@ -448,11 +448,15 @@
                 "type": "CustomScript",
                 "typeHandlerVersion": "2.0",
                 "autoUpgradeMinorVersion": true,
-                "settings": {
+                "settings":{
+                    "skipDos2Unix":false,
                     "fileUris": [
                         "[concat(variables('github'),'scripts/osconfig.sh')]"
-                    ],
-                "commandToExecute": " sh osconfig.sh"
+                    ]
+                },
+                "protectedSettings": {
+                    
+                    "commandToExecute": " sh osconfig.sh"
                 }
             }
         }
