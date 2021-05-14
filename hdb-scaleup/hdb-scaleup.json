@@ -154,10 +154,6 @@
             ],
             "defaultValue": "Standard_E20ds_v4"
         },
-           "virtualMachineCount": {
-            "type": "int",
-            "defaultValue": 1
-        },
         "virtualMachineTagValues": {
             "type": "object"
         }
@@ -189,7 +185,7 @@
             "Environment": "[parameters('environmentType')]"
         },
         "allVMTags": "[union(parameters('virtualMachineTagValues'),variables('sidTag'),variables('envTag'))]",
-        "github": "https://raw.githubusercontent.com/prasroy/hanaonazurearm/master/hdb-scaleup",
+        "github": "https://raw.githubusercontent.com/prasroy/hanaonazurearm/master/hdb-scaleup/",
         "diskSizes": {
             "SBX": {
                 "osdiskSizeGB": 64,
@@ -212,10 +208,13 @@
     },
     "resources": [
         {
-            "apiVersion": "2018-04-01",
+            "apiVersion": "2020-12-01",
             "type": "Microsoft.Compute/proximityPlacementGroups",
             "name": "[variables('ppgName')]",
-            "location": "[variables('locationName')]"
+            "location": "[variables('locationName')]",
+            "properties": {
+                "proximityPlacementGroupType": "Standard"
+            }
         },
         {
             "type": "Microsoft.Compute/availabilitySets",
@@ -271,30 +270,26 @@
             }
         },
         {
-            "name": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-pip')]",
+            "name": "[concat(variables('sapMachineName'), '-pip')]",
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2019-02-01",
             "location": "[variables('locationName')]",
             "condition": "[parameters('hasPublicIP')]",
             "properties": {
                 "publicIpAllocationMethod": "Static",
-                "dnsSettings": "[if(parameters('domainNameLabel'),json(concat('{\"domainNameLabel\":\"',concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0')),'\"}')),json('null'))]"
+                "dnsSettings": "[if(parameters('domainNameLabel'),json(concat('{\"domainNameLabel\":\"',concat(variables('sapMachineName')),'\"}')),json('null'))]"
             },
             "sku": {
                 "name": "Standard"
-            },
-            "copy": {
-                "count": "[parameters('virtualMachineCount')]",
-                "name": "pipLoop"
             }
         },
         {
-            "name": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
+            "name": "[concat(variables('sapMachineName'), '-nic')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-07-01",
             "location": "[variables('locationName')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIpAddresses/', concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-pip'))]"
+                "[concat('Microsoft.Network/publicIpAddresses/', concat(variables('sapMachineName'), '-pip'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -305,28 +300,24 @@
                                 "id": "[variables('dbsubnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-pip')),'\"}')), json('null'))]",
+                            "publicIpAddress": "[if(parameters('hasPublicIP'),json(concat('{ \"id\" : \"',resourceId('Microsoft.Network/publicIpAddresses', concat(variables('sapMachineName'), '-pip')),'\"}')), json('null'))]",
                             "primary": true,
                             "privateIPAddressVersion": "IPv4"
                         }
                     }
                 ],
                 "enableAcceleratedNetworking": true
-            },
-            "copy": {
-                "count": "[parameters('virtualMachineCount')]",
-                "name": "nicLoop"
             }
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "name": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
+            "name": "[variables('sapMachineName')]",
             "dependsOn": [
-                "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic')]",
-                "[concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('sapMachineName'), '-nic'))]",
+                "[concat('AddDisks-',variables('sapMachineName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagstorageName'))]"
             ],
-            "apiVersion": "2018-10-01",
+            "apiVersion": "2020-06-01",
             "location": "[variables('locationName')]",
             "properties": {
                 "availabilitySet":{
@@ -339,7 +330,7 @@
                     "vmSize": "[parameters('virtualMachineSize')]"
                 },
                 "osProfile": {
-                    "computerName": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
+                    "computerName": "[variables('sapMachineName')]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPasswordOrKey')]",
                     "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
@@ -352,7 +343,7 @@
                         "version": "[parameters('version')]"
                     },
                     "osDisk": {
-                        "name": "[concat(variables('sapMachineName'),'-', padLeft(copyIndex(1),2,'0'), '-osdisk')]",
+                        "name": "[concat(variables('sapMachineName'), '-osdisk')]",
                         "caching": "ReadWrite",
                         "createOption": "FromImage",
                         "diskSizeGB": "[if(startsWith(toLower(parameters('publisher')),'microsoft') ,127, 32)]",
@@ -367,13 +358,13 @@
                             "count": "[variables('nrOfDisks')]",
                             "input": {
 
-                                "lun": "[reference(concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))).outputs.diskArray.value[copyIndex('dataDisks')].lun]",
-                                "createOption": "[reference(concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))).outputs.diskArray.value[copyIndex('dataDisks')].createOption]",
-                                "diskSizeGB": "[reference(concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))).outputs.diskArray.value[copyIndex('dataDisks')].properties.diskSizeGB]",
-                                "caching": "[reference(concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))).outputs.diskArray.value[copyIndex('dataDisks')].caching]",
-                                "writeAcceleratorEnabled": "[reference(concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))).outputs.diskArray.value[copyIndex('dataDisks')].writeAcceleratorEnabled]",
+                                "lun": "[reference(concat('AddDisks-',variables('sapMachineName'))).outputs.diskArray.value[copyIndex('dataDisks')].lun]",
+                                "createOption": "[reference(concat('AddDisks-',variables('sapMachineName'))).outputs.diskArray.value[copyIndex('dataDisks')].createOption]",
+                                "diskSizeGB": "[reference(concat('AddDisks-',variables('sapMachineName'))).outputs.diskArray.value[copyIndex('dataDisks')].properties.diskSizeGB]",
+                                "caching": "[reference(concat('AddDisks-',variables('sapMachineName'))).outputs.diskArray.value[copyIndex('dataDisks')].caching]",
+                                "writeAcceleratorEnabled": "[reference(concat('AddDisks-',variables('sapMachineName'))).outputs.diskArray.value[copyIndex('dataDisks')].writeAcceleratorEnabled]",
                                 "managedDisk": {
-                                    "id": "[resourceId('Microsoft.Compute/disks', concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'),reference(concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))).outputs.diskArray.value[copyIndex('dataDisks')].name))]"
+                                    "id": "[resourceId('Microsoft.Compute/disks', concat(variables('sapMachineName')),reference(concat('AddDisks-',variables('sapMachineName'))).outputs.diskArray.value[copyIndex('dataDisks')].name)]"
                                 }
                             }
                         }
@@ -382,7 +373,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'), '-nic'))]",
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('sapMachineName'), '-nic'))]",
                             "properties": {
                                 "primary": true
                             }
@@ -396,31 +387,22 @@
                     }
                 }
             },
-            "copy": {
-                "count": "[parameters('virtualMachineCount')]",
-                "name": "vmLoop"
-            },
-
             "tags": "[variables('allVMTags')]"
         },
         {
-            "name": "[concat('AddDisks-',variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]",
+            "name": "[concat('AddDisks-',variables('sapMachineName'))]",
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2018-05-01",
-            "copy": {
-                "name": "vmLoop",
-                "count": "[parameters('virtualMachineCount')]"
-            },
+            "apiVersion": "2020-06-01",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('github'),'/HDBDisks.json')]",
+                    "uri": "[concat(variables('github'), '/HDBDisks.json')]",
                     "contentVersion": "1.0.0.0"
                 },
 
                 "parameters": {
                     "machineName": {
-                        "value": "[concat(variables('sapMachineName'),'-',padLeft(copyIndex(1),2,'0'))]"
+                        "value": "[variables('sapMachineName')]"
                     },
                     "machineSize": {
                         "value": "[parameters('environmentType')]"
@@ -432,17 +414,13 @@
             }
         },
         {
-            "name": "[concat('customScript',variables('sapMachineName'))]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat('customScript-', variables('sapMachineName'))]",
             "location": "[resourceGroup().location]",
             "apiVersion": "2019-03-01",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('sapMachineName'), '-',padLeft(copyIndex(1),2,'0'))]"
+                 "[concat('Microsoft.Compute/virtualMachines/', variables('sapMachineName'))]"
             ],
-            "copy": {
-                "name": "customScriptLoop",
-                "count": "[parameters('virtualMachineCount')]"
-            },
             "properties": {
                 "publisher": "Microsoft.Azure.Extensions",
                 "type": "CustomScript",
@@ -454,8 +432,7 @@
                         "[concat(variables('github'),'scripts/osconfig.sh')]"
                     ]
                 },
-                "protectedSettings": {
-                    
+                "protectedSettings": {  
                     "commandToExecute": " sh osconfig.sh"
                 }
             }
