@@ -6,7 +6,7 @@
       "value": "azureuser"
     },
     "adminPasswordOrKey": {
-      "value": ""
+      "value": "Pass12345"
     },
     "authenticationType": {
       "value": "sshPublicKey"
@@ -61,9 +61,6 @@
     },
     "virtualMachineSize": {
       "value": "Standard_E8ds_v4"
-    },
-    "virtualMachineCount": {
-      "value": 1
     },
     "virtualNetworkName": {
       "value": "azprwesapsles-vnet"
