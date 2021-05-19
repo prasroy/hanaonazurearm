@@ -1,7 +1,0 @@
----
-- hosts: hana
-  become: true
-  vars_files:
-    - vars/default.yml
-  roles:
-    - saphana-install
